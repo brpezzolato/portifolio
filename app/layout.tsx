@@ -5,6 +5,8 @@ import { GeistMono } from 'geist/font/mono';
 import { SiteHeader } from '@/components/site/site-header';
 import { SiteFooter } from '@/components/site/site-footer';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { Preloader } from '@/components/site/preloader';
+import { SmoothScroll } from '@/components/site/smooth-scroll';
 import { site } from '@/lib/site';
 import './globals.css';
 
@@ -36,11 +38,11 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
       >
         <div aria-hidden className="site-backdrop" />
         <div aria-hidden className="site-grain" />
+        <Preloader />
+        <SmoothScroll />
         <TooltipProvider>
           <SiteHeader />
-          <main className="mx-auto w-full max-w-5xl px-5 pt-28 pb-24 sm:px-8">
-            {children}
-          </main>
+          <main>{children}</main>
           <SiteFooter />
         </TooltipProvider>
       </body>

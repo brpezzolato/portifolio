@@ -4,23 +4,20 @@ export const site = {
   handle: 'brpezzolato',
   role: 'Ciência de Dados & IA',
   location: 'Brasil',
-  headline: 'Transformo dados em',
-  typed: ['decisões', 'produtos', 'conversas', 'modelos de IA'],
+  headline: ['Dados que', 'viram decisão.'],
   intro:
     'Estudante de Ciência de Dados e assistente de dados no Instituto Conhecimento Liberta. Aqui eu publico o que estou construindo e aprendendo: projetos, análises e experimentos com IA.',
-  study: { label: 'Formação', title: 'Ciência de Dados', detail: 'Estudante' },
-  work: {
-    label: 'Trabalho',
-    title: 'Instituto Conhecimento Liberta',
-    detail: 'Assistente de dados',
-  },
-  /* O que a orbe "fala" na home, uma frase por vez. */
-  assistant: [
-    'Olá. Eu sou a assistente do Bruno.',
-    'Ele estuda Ciência de Dados e é assistente de dados no Instituto Conhecimento Liberta.',
-    'Agora ele está construindo o Vetra, um app que mostra seu dinheiro por inteiro.',
-    'Quer ver os projetos? É só rolar a página.',
+  study: 'Estudante de Ciência de Dados',
+  work: 'Assistente de dados no Instituto Conhecimento Liberta',
+  manifesto:
+    'Sou o Bruno. Estudo Ciência de Dados e trabalho como assistente de dados no Instituto Conhecimento Liberta. Gosto de pegar dados bagunçados e transformar em algo que ajuda alguém a decidir: um gráfico, um modelo, um produto.',
+  epochs: [
+    { label: 'época 01', title: 'Ciência de Dados', detail: 'Estudante' },
+    { label: 'época 02', title: 'Instituto Conhecimento Liberta', detail: 'Assistente de dados' },
+    { label: 'época 03', title: 'Vetra', detail: 'Construindo agora' },
   ],
+  tokens: ['dados', 'Python', 'SQL', 'estatística', 'machine learning', 'visualização', 'LLMs', 'Next.js', 'Supabase', 'produto'],
+  layers: ['Dados brutos', 'Limpeza e features', 'Modelo', 'Avaliação', 'Decisão'],
   now: 'Construindo o Vetra, um app que mostra seu dinheiro por inteiro.',
   email: 'contato@exemplo.com',
   links: [

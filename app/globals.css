@@ -78,7 +78,7 @@
   --chart-5: oklch(0.269 0 0);
   --radius: 0.75rem;
   /* Único acento: azul-gelo de IA (a "voz" da orbe e o status ao vivo). */
-  --signal: oklch(0.62 0.13 230);
+  --signal: #1f7fbf;
   --grid-line: oklch(0 0 0 / 5%);
 }
 
@@ -101,7 +101,7 @@
   --border: oklch(1 0 0 / 9%);
   --input: oklch(1 0 0 / 14%);
   --ring: oklch(0.556 0 0);
-  --signal: oklch(0.83 0.1 225);
+  --signal: #9ad8ff;
   --grid-line: oklch(1 0 0 / 4%);
 }
 
@@ -231,6 +231,35 @@ html {
 
 @media (prefers-reduced-motion: reduce) {
   .signal-dot::after {
+    animation: none;
+  }
+}
+
+/* Lenis (rolagem suave) */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* Faixa de tokens */
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
     animation: none;
   }
 }
