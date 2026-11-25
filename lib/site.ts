@@ -2,11 +2,25 @@
 export const site = {
   name: 'Bruno Pezzolato',
   handle: 'brpezzolato',
-  role: 'Desenvolvedor de produto',
+  role: 'Ciência de Dados & IA',
   location: 'Brasil',
-  headline: 'Construo produtos digitais claros, rápidos e bem acabados.',
+  headline: 'Transformo dados em',
+  typed: ['decisões', 'produtos', 'conversas', 'modelos de IA'],
   intro:
-    'Aqui eu publico o que estou construindo, o que lancei e o que aprendi no caminho. Do primeiro rascunho até a versão em produção.',
+    'Estudante de Ciência de Dados e assistente de dados no Instituto Conhecimento Liberta. Aqui eu publico o que estou construindo e aprendendo: projetos, análises e experimentos com IA.',
+  study: { label: 'Formação', title: 'Ciência de Dados', detail: 'Estudante' },
+  work: {
+    label: 'Trabalho',
+    title: 'Instituto Conhecimento Liberta',
+    detail: 'Assistente de dados',
+  },
+  /* O que a orbe "fala" na home, uma frase por vez. */
+  assistant: [
+    'Olá. Eu sou a assistente do Bruno.',
+    'Ele estuda Ciência de Dados e é assistente de dados no Instituto Conhecimento Liberta.',
+    'Agora ele está construindo o Vetra, um app que mostra seu dinheiro por inteiro.',
+    'Quer ver os projetos? É só rolar a página.',
+  ],
   now: 'Construindo o Vetra, um app que mostra seu dinheiro por inteiro.',
   email: 'contato@exemplo.com',
   links: [
