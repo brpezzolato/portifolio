@@ -23,7 +23,7 @@ export function LoginForm() {
           {error}
         </p>
       )}
-      <Button type="submit" variant="glass" size="pill" className="w-full" disabled={pending}>
+      <Button type="submit" variant="default" size="pill" className="w-full" disabled={pending}>
         {pending ? 'Entrando…' : 'Entrar'}
       </Button>
     </form>

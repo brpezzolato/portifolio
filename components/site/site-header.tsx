@@ -10,7 +10,8 @@ import { nav, site, ui } from '@/lib/site';
 import { cn } from 'cn';
 import { useLang } from './providers';
 
-/* Navegação em pílula flutuante, de vidro líquido (app/glass.css): iniciais,
+/* Navegação em pílula flutuante (fundo levemente translúcido, borda fina e
+   desfoque discreto, sem vidro líquido): iniciais,
    links das seções com uma "gota" que segue o mouse, idioma e tema. Ao rolar,
    a pílula encolhe um pouco. No celular, os links vão para uma gaveta. */
 export function SiteHeader() {
@@ -51,7 +52,7 @@ export function SiteHeader() {
     <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-3 pt-[max(0.9rem,env(safe-area-inset-top))]">
       <div
         className={cn(
-          'glass glass-bar glass-lens glass-static pointer-events-auto flex items-center gap-1 transition-[padding] duration-500',
+          'pointer-events-auto flex items-center gap-1 rounded-full border border-border bg-background/80 shadow-[0_8px_30px_-12px_rgb(0_0_0/0.18)] backdrop-blur-md transition-[padding] duration-500',
           scrolled ? 'p-1' : 'p-1.5',
         )}
       >

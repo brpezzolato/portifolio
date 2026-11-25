@@ -49,12 +49,12 @@ export default async function ProjectPage({ params }: PageProps<'/projetos/[slug
           {(project.url || project.repo) && (
             <div className="mt-8 flex gap-3">
               {project.url && (
-                <a href={project.url} target="_blank" rel="noopener noreferrer" className={cn(buttonVariants({ variant: 'glass', size: 'pill' }))}>
+                <a href={project.url} target="_blank" rel="noopener noreferrer" className={cn(buttonVariants({ variant: 'default', size: 'pill' }))}>
                   Abrir projeto <ArrowUpRight data-icon="inline-end" />
                 </a>
               )}
               {project.repo && (
-                <a href={project.repo} target="_blank" rel="noopener noreferrer" className={cn(buttonVariants({ variant: 'glass-quiet', size: 'pill' }))}>
+                <a href={project.repo} target="_blank" rel="noopener noreferrer" className={cn(buttonVariants({ variant: 'outline', size: 'pill' }))}>
                   Código <ArrowUpRight data-icon="inline-end" />
                 </a>
               )}

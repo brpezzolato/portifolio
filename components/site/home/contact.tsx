@@ -64,7 +64,7 @@ export function Contact() {
 
             <div className="mt-12 flex flex-wrap items-center justify-between gap-6">
               <div className="flex flex-wrap items-center gap-4">
-                <Button type="submit" variant="glass" size="pill" disabled={pending} className="h-12 px-7 text-base">
+                <Button type="submit" variant="default" size="pill" disabled={pending} className="h-12 px-7 text-base">
                   {pending ? t(ui.formSending) : t(ui.formSend)}
                   <ArrowRight data-icon="inline-end" />
                 </Button>

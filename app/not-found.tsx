@@ -8,7 +8,7 @@ export default function NotFound() {
       <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">Erro 404</p>
       <h1 className="text-sheen mt-3 text-6xl font-semibold tracking-tighter">Nada por aqui.</h1>
       <p className="mt-4 text-muted-foreground">Essa página não existe (ou ainda não foi publicada).</p>
-      <Link href="/" className={cn(buttonVariants({ variant: 'glass-quiet', size: 'pill' }), 'mt-8')}>
+      <Link href="/" className={cn(buttonVariants({ variant: 'outline', size: 'pill' }), 'mt-8')}>
         Voltar ao início
       </Link>
     </div>

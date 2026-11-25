@@ -33,7 +33,7 @@ export default async function AdminPage() {
           <h1 className="mt-1 text-3xl font-semibold tracking-tight">Publicar</h1>
         </div>
         <form action={signOut}>
-          <Button variant="glass-quiet" size="pill" type="submit">
+          <Button variant="outline" size="pill" type="submit">
             <LogOut data-icon="inline-start" /> Sair
           </Button>
         </form>
@@ -44,7 +44,7 @@ export default async function AdminPage() {
           <TabsTrigger value="projetos"><FolderKanban /> Projetos</TabsTrigger>
         </TabsList>
         <TabsContent value="novidades" className="mt-6 space-y-3">
-          <Button variant="glass" size="pill"><Plus data-icon="inline-start" /> Nova novidade</Button>
+          <Button variant="default" size="pill"><Plus data-icon="inline-start" /> Nova novidade</Button>
           {posts.map((p) => (
             <Card key={p.slug} size="sm">
               <CardHeader>
@@ -55,7 +55,7 @@ export default async function AdminPage() {
           ))}
         </TabsContent>
         <TabsContent value="projetos" className="mt-6 space-y-3">
-          <Button variant="glass" size="pill"><Plus data-icon="inline-start" /> Novo projeto</Button>
+          <Button variant="default" size="pill"><Plus data-icon="inline-start" /> Novo projeto</Button>
           {projects.map((p) => (
             <Card key={p.slug} size="sm">
               <CardHeader>
