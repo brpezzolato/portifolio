@@ -4,20 +4,21 @@ export const site = {
   handle: 'brpezzolato',
   role: 'Ciência de Dados & IA',
   location: 'Brasil',
+  hello: 'Oi, eu sou o Bruno.',
   headline: ['Dados que', 'viram decisão.'],
   intro:
-    'Estudante de Ciência de Dados e assistente de dados no Instituto Conhecimento Liberta. Aqui eu publico o que estou construindo e aprendendo: projetos, análises e experimentos com IA.',
+    'Estudante de Ciência de Dados e assistente de dados no Instituto Conhecimento Liberta. Aqui eu publico o que estou construindo e aprendendo.',
   study: 'Estudante de Ciência de Dados',
   work: 'Assistente de dados no Instituto Conhecimento Liberta',
   manifesto:
     'Sou o Bruno. Estudo Ciência de Dados e trabalho como assistente de dados no Instituto Conhecimento Liberta. Gosto de pegar dados bagunçados e transformar em algo que ajuda alguém a decidir: um gráfico, um modelo, um produto.',
-  epochs: [
-    { label: 'época 01', title: 'Ciência de Dados', detail: 'Estudante' },
-    { label: 'época 02', title: 'Instituto Conhecimento Liberta', detail: 'Assistente de dados' },
-    { label: 'época 03', title: 'Vetra', detail: 'Construindo agora' },
+  /* O que estou fazendo agora (só fatos). */
+  doing: [
+    { verb: 'Estudando', what: 'Ciência de Dados', note: 'Estudante' },
+    { verb: 'Trabalhando', what: 'Instituto Conhecimento Liberta', note: 'Assistente de dados' },
+    { verb: 'Construindo', what: 'Vetra', note: 'Um app que mostra seu dinheiro por inteiro' },
   ],
-  tokens: ['dados', 'Python', 'SQL', 'estatística', 'machine learning', 'visualização', 'LLMs', 'Next.js', 'Supabase', 'produto'],
-  layers: ['Dados brutos', 'Limpeza e features', 'Modelo', 'Avaliação', 'Decisão'],
+  tags: ['Ciência de Dados', 'Instituto Conhecimento Liberta', 'Vetra', 'IA', 'Next.js', 'Supabase'],
   now: 'Construindo o Vetra, um app que mostra seu dinheiro por inteiro.',
   email: 'contato@exemplo.com',
   links: [

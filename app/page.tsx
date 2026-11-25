@@ -2,12 +2,9 @@ import Link from 'next/link';
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { AiOrb } from '@/components/site/ai-orb';
-import { LatentSpace } from '@/components/site/latent-space';
-import { LossCurve } from '@/components/site/loss-curve';
-import { NeuralNet } from '@/components/site/neural-net';
 import { Reveal } from '@/components/site/reveal';
-import { ScrambleText } from '@/components/site/scramble-text';
 import { ScrollWords } from '@/components/site/scroll-words';
+import { TypeLines } from '@/components/site/type-lines';
 import { getPosts, getProjects } from '@/lib/content';
 import { formatShortDate, postKindLabel, projectStatusLabel } from '@/lib/format';
 import { site } from '@/lib/site';
@@ -25,37 +22,46 @@ function Label({ n, children }: { n: string; children: React.ReactNode }) {
 }
 
 export default async function Home() {
-  const [projects, posts] = await Promise.all([getProjects(), getPosts(5)]);
+  const [projects, posts] = await Promise.all([getProjects(), getPosts(4)]);
 
   return (
     <>
-      {/* Herói: a orbe ao centro, título gigante por cima, rodapé em três colunas */}
-      <section className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden pb-8">
-        <AiOrb className="absolute top-1/2 left-1/2 aspect-square w-[min(92vw,78svh)] -translate-x-1/2 -translate-y-[56%]" />
-        <div className={`${wrap} relative`}>
-          <h1 className="text-[clamp(3.2rem,12.5vw,13rem)] leading-[0.86] font-semibold tracking-[-0.06em]">
-            <ScrambleText text={site.headline[0]} delay={1500} className="block" />
-            <ScrambleText text={site.headline[1]} delay={1700} className="block text-right text-foreground/90" />
-          </h1>
-          <div className="mt-10 grid gap-4 border-t border-border pt-5 text-sm sm:grid-cols-3">
+      {/* Herói: a orbe passeando atrás do título, que é digitado */}
+      <section className="relative flex min-h-[100svh] flex-col overflow-hidden pt-24 pb-8">
+        <div className={`${wrap} relative flex flex-1 flex-col`}>
+          <div className="relative my-auto py-10">
+            <AiOrb className="pointer-events-none absolute top-1/2 left-1/2 aspect-square w-[min(88vw,70svh)] -translate-x-1/2 -translate-y-1/2" />
+            <p className="relative mb-4 text-lg text-muted-foreground sm:text-xl">
+              <TypeLines lines={[site.hello]} speed={45} keepCaret={false} />
+            </p>
+            <h1 className="relative text-[clamp(3.2rem,12.5vw,13rem)] leading-[0.88] font-semibold tracking-[-0.06em]">
+              <TypeLines
+                lines={[...site.headline]}
+                lineClassNames={['', 'text-foreground/90 sm:pl-[15%]']}
+                speed={55}
+                delay={site.hello.length * 50 + 350}
+              />
+            </h1>
+          </div>
+          <div className="relative mt-10 grid gap-4 border-t border-border pt-5 text-sm sm:grid-cols-3">
             <p className="text-muted-foreground">{site.study}</p>
             <p className="text-muted-foreground sm:text-center">{site.work}</p>
-            <a href="#manifesto" className="inline-flex items-center gap-1.5 sm:justify-self-end">
-              Role para explorar <ArrowDownRight className="size-4" />
+            <a href="#sobre" className="inline-flex items-center gap-1.5 sm:justify-self-end">
+              Role para me conhecer <ArrowDownRight className="size-4" />
             </a>
           </div>
         </div>
       </section>
 
-      {/* Tokens: o vocabulário do trabalho, como um tokenizador veria */}
-      <div aria-label="Ferramentas e temas" className="overflow-hidden border-y border-border py-4">
+      {/* Faixa com o que me define */}
+      <div aria-label="Temas" className="overflow-hidden border-y border-border py-5">
         <div className="marquee">
-          {[0, 1].map((dup) => (
-            <ul key={dup} aria-hidden={dup === 1} className="flex shrink-0 items-center gap-3 pr-3">
-              {site.tokens.map((t, i) => (
-                <li key={t} className="flex items-center gap-2 rounded-md border border-border px-3 py-1.5 text-sm whitespace-nowrap">
-                  <span className="font-mono text-[0.65rem] text-signal">{(1042 + i * 317).toString()}</span>
-                  {t}
+          {[0, 1, 2].map((dup) => (
+            <ul key={dup} aria-hidden={dup > 0} className="flex shrink-0 items-center">
+              {site.tags.map((t) => (
+                <li key={t} className="flex items-center text-2xl font-medium tracking-tight whitespace-nowrap sm:text-3xl">
+                  <span className="px-6">{t}</span>
+                  <span className="text-signal">✦</span>
                 </li>
               ))}
             </ul>
@@ -63,41 +69,46 @@ export default async function Home() {
         </div>
       </div>
 
-      {/* Manifesto */}
-      <section id="manifesto" className={`${wrap} py-28 sm:py-40`}>
-        <Label n="01">Sobre</Label>
+      {/* Sobre: manifesto que se preenche na rolagem */}
+      <section id="sobre" className={`${wrap} py-28 sm:py-40`}>
+        <Label n="01">Sobre mim</Label>
         <ScrollWords
           text={site.manifesto}
           className="max-w-5xl text-[clamp(1.7rem,4vw,3.6rem)] leading-[1.12] font-medium tracking-[-0.03em]"
         />
       </section>
 
-      {/* Trajetória como treino */}
+      {/* Agora */}
       <section className={`${wrap} pb-28 sm:pb-40`}>
-        <Label n="02">Trajetória</Label>
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
-          <h2 className="text-3xl font-semibold tracking-[-0.03em] sm:text-5xl">
-            Cada etapa, uma época de treino.
-          </h2>
-          <LossCurve epochs={[...site.epochs]} />
-        </div>
+        <Label n="02">Agora</Label>
+        <ul className="grid gap-px overflow-hidden rounded-3xl border border-border bg-border md:grid-cols-3">
+          {site.doing.map((d, i) => (
+            <li key={d.verb} className="bg-background">
+              <Reveal delay={i * 0.08} className="flex h-full flex-col justify-between gap-16 p-6 sm:p-8">
+                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span className="signal-dot size-1.5!" />
+                  {d.verb}
+                </span>
+                <div>
+                  <p className="text-3xl leading-tight font-medium tracking-[-0.03em] sm:text-4xl">{d.what}</p>
+                  <p className="mt-2 text-muted-foreground">{d.note}</p>
+                </div>
+              </Reveal>
+            </li>
+          ))}
+        </ul>
       </section>
 
-      {/* Projetos: espaço latente + lista */}
+      {/* Projetos */}
       <section className={`${wrap} pb-28 sm:pb-40`}>
         <Label n="03">Projetos</Label>
-        <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
-          <h2 className="text-3xl font-semibold tracking-[-0.03em] sm:text-5xl">Espaço latente</h2>
-          <p className="max-w-sm text-muted-foreground">
-            Cada nuvem é um projeto. Passe o mouse num rótulo para acender o cluster.
-          </p>
+        <div className="mb-6 flex items-end justify-between gap-6">
+          <h2 className="text-3xl font-semibold tracking-[-0.03em] sm:text-5xl">O que eu construo</h2>
+          <Link href="/projetos" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+            Todos <ArrowUpRight className="size-4" />
+          </Link>
         </div>
-        <Reveal>
-          <LatentSpace
-            items={projects.map((p) => ({ slug: p.slug, title: p.title, status: projectStatusLabel[p.status] }))}
-          />
-        </Reveal>
-        <ul className="mt-12 border-t border-border">
+        <ul className="border-t border-border">
           {projects.map((p, i) => (
             <li key={p.slug}>
               <Link
@@ -119,46 +130,34 @@ export default async function Home() {
         </ul>
       </section>
 
-      {/* Como eu trabalho */}
+      {/* Novidades */}
       <section className={`${wrap} pb-28 sm:pb-40`}>
-        <Label n="04">Como eu trabalho</Label>
-        <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
-          <h2 className="max-w-2xl text-3xl font-semibold tracking-[-0.03em] sm:text-5xl">
-            Do dado bruto à decisão, camada por camada.
-          </h2>
-          <p className="max-w-sm text-muted-foreground">Passe o mouse num neurônio para ver as ligações.</p>
-        </div>
-        <Reveal>
-          <NeuralNet labels={[...site.layers]} />
-        </Reveal>
-      </section>
-
-      {/* Novidades: log de treino */}
-      <section className={`${wrap} pb-28 sm:pb-40`}>
-        <Label n="05">Novidades</Label>
-        <div className="mb-8 flex items-end justify-between gap-6">
-          <h2 className="text-3xl font-semibold tracking-[-0.03em] sm:text-5xl">Log</h2>
+        <Label n="04">Novidades</Label>
+        <div className="mb-6 flex items-end justify-between gap-6">
+          <h2 className="text-3xl font-semibold tracking-[-0.03em] sm:text-5xl">O que tem de novo</h2>
           <Link href="/novidades" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
             Ver tudo <ArrowUpRight className="size-4" />
           </Link>
         </div>
-        <ol className="rounded-3xl border border-border bg-card/40 p-2 font-mono text-sm">
-          {posts.map((p) => (
-            <li key={p.slug}>
+        <ul className="grid gap-4 md:grid-cols-2">
+          {posts.map((p, i) => (
+            <li key={p.slug} className={i === 0 ? 'md:col-span-2' : ''}>
               <Link
                 href={`/novidades/${p.slug}`}
-                className="grid grid-cols-1 gap-1 rounded-2xl px-4 py-4 transition-colors hover:bg-foreground/[0.04] sm:grid-cols-[7rem_8rem_minmax(0,1fr)] sm:gap-4"
+                className="group flex h-full flex-col justify-between gap-10 rounded-3xl border border-border bg-card/40 p-6 transition-colors hover:border-foreground/20 hover:bg-card sm:p-8"
               >
-                <time dateTime={p.publishedAt} className="text-muted-foreground">[{formatShortDate(p.publishedAt)}]</time>
-                <span className="text-signal">{postKindLabel[p.kind].toLowerCase()}</span>
-                <span className="font-sans">
-                  <span className="text-foreground">{p.title}</span>
-                  <span className="block text-muted-foreground">{p.excerpt}</span>
-                </span>
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span>{postKindLabel[p.kind]}</span>
+                  <time dateTime={p.publishedAt} className="font-mono text-xs">{formatShortDate(p.publishedAt)}</time>
+                </div>
+                <div>
+                  <p className={`font-medium tracking-[-0.03em] ${i === 0 ? 'text-3xl sm:text-5xl' : 'text-2xl'}`}>{p.title}</p>
+                  <p className="mt-2 max-w-2xl text-muted-foreground">{p.excerpt}</p>
+                </div>
               </Link>
             </li>
           ))}
-        </ol>
+        </ul>
       </section>
     </>
   );

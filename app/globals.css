@@ -263,3 +263,9 @@ html.lenis body {
     animation: none;
   }
 }
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}

@@ -1,6 +1,5 @@
 import { site } from '@/lib/site';
 import { LiveClock } from './live-clock';
-import { ScrambleText } from './scramble-text';
 
 export function SiteFooter() {
   return (
@@ -11,7 +10,7 @@ export function SiteFooter() {
           href={`mailto:${site.email}`}
           className="mt-3 block text-[clamp(2.2rem,8.5vw,8rem)] leading-[0.95] font-semibold tracking-[-0.045em] break-words transition-colors hover:text-signal"
         >
-          <ScrambleText text="Vamos conversar." hover />
+          Vamos conversar.
         </a>
         <p className="mt-4 font-mono text-sm text-muted-foreground">{site.email}</p>
         <div className="mt-20 flex flex-col justify-between gap-4 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row">

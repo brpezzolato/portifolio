@@ -164,6 +164,14 @@ export function AiOrb({ className }: { className?: string }) {
       const t = (performance.now() - t0) / 1000;
       uniforms.t.value = t;
       uniforms.energy.value += (energyTarget - uniforms.energy.value) * 0.05;
+      // deriva lenta (a orbe "passeia" atrás do título) + paralaxe da rolagem
+      orb.position.x = Math.sin(t * 0.21) * 0.18;
+      orb.position.y = Math.cos(t * 0.17) * 0.12;
+      halo.position.x = orb.position.x;
+      halo.position.y = orb.position.y;
+      const sy = Math.min(window.scrollY, window.innerHeight * 1.2);
+      el.style.transform = `translate3d(0, ${sy * 0.35}px, 0) scale(${1 - sy / (window.innerHeight * 6)})`;
+      el.style.opacity = String(Math.max(0, 1 - sy / (window.innerHeight * 0.95)));
       orb.rotation.y += (mx * 0.6 - orb.rotation.y) * 0.03 + 0.0008;
       orb.rotation.x += (my * 0.35 - orb.rotation.x) * 0.03;
       renderer.render(scene, camera);
