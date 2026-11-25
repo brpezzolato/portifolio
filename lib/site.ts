@@ -103,6 +103,7 @@ export const ui = {
   formEmail: { pt: 'E-mail', en: 'Email' },
   formMessage: { pt: 'Mensagem', en: 'Message' },
   formSend: { pt: 'Enviar mensagem', en: 'Send message' },
+  formHint: { pt: 'Todos os campos são obrigatórios.', en: 'All fields are required.' },
   writeMe: { pt: 'Escrever mensagem', en: 'Write a message' },
   madHi: { pt: 'Oi, Bruno! Meu nome é', en: 'Hi Bruno! My name is' },
   madMid: { pt: 'e você pode me responder em', en: 'and you can reach me at' },

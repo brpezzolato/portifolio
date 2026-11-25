@@ -19,31 +19,35 @@ export function About({ stats }: { stats: { projects: number; news: number } }) 
 
   return (
     <section id="sobre" ref={section} className="scroll-mt-20 py-28 sm:py-36">
-      <div className={`${wrap} grid gap-14 lg:grid-cols-12 lg:gap-10`}>
+      {/* rótulo numa linha só, acima das duas colunas, para elas começarem
+          exatamente na mesma altura */}
+      <div className={wrap}>
+        <p className="mb-10 flex items-center gap-2 text-sm text-muted-foreground">
+          <span className="size-1.5 rounded-full bg-signal" />
+          {t(ui.aboutTitle)}
+        </p>
+      </div>
+      <div className={`${wrap} grid items-start gap-12 lg:grid-cols-12 lg:gap-12`}>
         {/* texto preso */}
         <div className="lg:col-span-7">
-          <div className="lg:sticky lg:top-32">
-            <p className="mb-8 flex items-center gap-2 text-sm text-muted-foreground">
-              <span className="size-1.5 rounded-full bg-signal" />
-              {t(ui.aboutTitle)}
-            </p>
+          <div className="lg:sticky lg:top-28">
             <ScrollWords
               text={t(site.bio)}
               target={section}
-              offset={['start 0.6', 'end 0.9']}
+              offset={['start 0.7', 'end 0.85']}
               className="text-[clamp(1.8rem,3.6vw,3.4rem)] leading-[1.1] font-medium tracking-[-0.035em]"
             />
           </div>
         </div>
 
         {/* cartões */}
-        <ul className="grid gap-5 lg:col-span-5 lg:gap-8 lg:pt-[18vh] lg:pb-[22vh]">
+        <ul className="grid gap-4 lg:col-span-5">
           {site.skills.map((s, i) => {
             const Icon = icons[i % icons.length];
             return (
               <li key={s.title.pt}>
                 <Reveal delay={0.05}>
-                  <article className="group flex items-start gap-5 rounded-[1.75rem] border border-border bg-card p-6 transition-[transform,box-shadow] duration-500 hover:-translate-y-1 hover:shadow-[0_24px_48px_-28px_rgb(0_0_0/0.3)]">
+                  <article className="group flex min-h-[6.5rem] items-center gap-5 rounded-[1.75rem] border border-border bg-card p-6 transition-[transform,box-shadow] duration-500 hover:-translate-y-1 hover:shadow-[0_24px_48px_-28px_rgb(0_0_0/0.3)]">
                     <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-signal/10 text-signal transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110">
                       <Icon className="size-5" />
                     </span>
@@ -60,7 +64,7 @@ export function About({ stats }: { stats: { projects: number; news: number } }) 
           {/* números */}
           <li>
             <Reveal delay={0.05}>
-              <article className="grid grid-cols-3 gap-4 rounded-[1.75rem] border border-border bg-card p-6">
+              <article className="grid min-h-[6.5rem] grid-cols-3 items-center gap-4 rounded-[1.75rem] border border-border bg-card p-6">
                 {[
                   { n: stats.projects, l: t(ui.statProjects) },
                   { n: site.stack.length, l: t(ui.statStack) },
