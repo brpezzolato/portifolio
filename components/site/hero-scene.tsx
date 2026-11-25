@@ -107,8 +107,8 @@ export function HeroScene({ className }: { className?: string }) {
       t: { value: 0 },
       energy: { value: 0 },
       dark: { value: isDark() ? 1 : 0 },
-      ice: { value: new THREE.Color('#5aa9ff') },
-      violet: { value: new THREE.Color('#8b7bff') },
+      ice: { value: new THREE.Color('#10b981') },
+      violet: { value: new THREE.Color('#06b6d4') },
     };
     const geo = new THREE.SphereGeometry(1, 200, 200);
     const mat = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, uniforms });
@@ -133,7 +133,16 @@ export function HeroScene({ className }: { className?: string }) {
     const particles = new THREE.Points(pgeo, pmat);
     scene.add(particles);
 
+    // cores da orbe vêm da paleta (variáveis --orb-a/--orb-b no <html>)
+    const readOrb = () => {
+      const cs = getComputedStyle(document.documentElement);
+      const a = cs.getPropertyValue('--orb-a').trim();
+      const b = cs.getPropertyValue('--orb-b').trim();
+      if (a) uniforms.ice.value.set(a);
+      if (b) uniforms.violet.value.set(b);
+    };
     const paint = () => {
+      readOrb();
       const d = isDark();
       uniforms.dark.value = d ? 1 : 0;
       pmat.color.set(d ? '#8fa0c8' : '#7b8496');
@@ -144,7 +153,12 @@ export function HeroScene({ className }: { className?: string }) {
       paint();
       renderer.render(scene, camera);
     });
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'style'] });
+    const onPalette = () => {
+      paint();
+      renderer.render(scene, camera);
+    };
+    window.addEventListener('palette:change', onPalette);
 
     let halfW = 1;
     let halfH = 1;
@@ -216,6 +230,7 @@ export function HeroScene({ className }: { className?: string }) {
       ro.disconnect();
       io.disconnect();
       mo.disconnect();
+      window.removeEventListener('palette:change', onPalette);
       window.removeEventListener('pointermove', onMove);
       geo.dispose();
       mat.dispose();
