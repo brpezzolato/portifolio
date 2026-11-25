@@ -3,10 +3,9 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
-/* Orbe: esfera lisa (malha densa, não pontos) deformada por ruído simplex,
-   corpo preto e borda acesa por fresnel em azul-gelo → violeta. As normais
-   são recalculadas no vertex shader a partir da superfície deformada, por
-   isso a luz corre suave, sem facetas nem "degraus". */
+/* Cena do herói, em tela cheia: partículas finas atravessando da esquerda
+   para a direita (um fluxo de dados) e, à frente delas, a orbe lisa em
+   shader. A orbe se adapta ao tema: perolada no claro, preta no escuro. */
 
 const NOISE = /* glsl */ `
 vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}
@@ -64,33 +63,26 @@ void main(){
 const FRAG = /* glsl */ `
 uniform vec3 ice;
 uniform vec3 violet;
+uniform float dark;
 varying vec3 vN;
 varying vec3 vV;
 varying float vNoise;
 void main(){
   vec3 N=normalize(vN);vec3 V=normalize(vV);
-  float fr=pow(1.-max(dot(N,V),0.),2.6);
+  float fr=pow(1.-max(dot(N,V),0.),2.4);
   vec3 L=normalize(vec3(-.5,.8,.6));
-  float spec=pow(max(dot(reflect(-L,N),V),0.),90.);
-  vec3 rim=mix(ice,violet,smoothstep(-.4,.6,vNoise)*.6);
-  vec3 col=vec3(.01)+rim*fr*.95+vec3(1.)*spec*.18+ice*.02*(1.-fr);
-  gl_FragColor=vec4(col,1.);
+  float dif=max(dot(N,L),0.);
+  float spec=pow(max(dot(reflect(-L,N),V),0.),70.);
+  vec3 rim=mix(ice,violet,smoothstep(-.4,.6,vNoise)*.7);
+  // claro: pérola com sombra fria e borda colorida
+  vec3 pearl=mix(vec3(.80,.84,.93),vec3(.995),dif*.85+.15);
+  vec3 light=mix(pearl,rim,fr*.85)+vec3(1.)*spec*.25;
+  // escuro: corpo preto e borda acesa
+  vec3 night=vec3(.01)+rim*fr*.95+vec3(1.)*spec*.18+ice*.02*(1.-fr);
+  gl_FragColor=vec4(mix(light,night,dark),1.);
 }`;
 
-function haloTexture() {
-  const c = document.createElement('canvas');
-  c.width = c.height = 256;
-  const g = c.getContext('2d')!;
-  const r = g.createRadialGradient(128, 128, 0, 128, 128, 128);
-  r.addColorStop(0, 'rgba(150,205,255,0.16)');
-  r.addColorStop(0.45, 'rgba(140,150,255,0.05)');
-  r.addColorStop(1, 'rgba(130,120,255,0)');
-  g.fillStyle = r;
-  g.fillRect(0, 0, 256, 256);
-  return new THREE.CanvasTexture(c);
-}
-
-export function AiOrb({ className }: { className?: string }) {
+export function HeroScene({ className }: { className?: string }) {
   const host = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -107,28 +99,56 @@ export function AiOrb({ className }: { className?: string }) {
     el.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
-    camera.position.z = 5.2;
+    const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 50);
+    camera.position.z = 7;
 
+    const isDark = () => document.documentElement.classList.contains('dark');
     const uniforms = {
       t: { value: 0 },
       energy: { value: 0 },
-      ice: { value: new THREE.Color('#a9dcff') },
-      violet: { value: new THREE.Color('#b3a9ff') },
+      dark: { value: isDark() ? 1 : 0 },
+      ice: { value: new THREE.Color('#5aa9ff') },
+      violet: { value: new THREE.Color('#8b7bff') },
     };
-    const geo = new THREE.SphereGeometry(1, 220, 220);
+    const geo = new THREE.SphereGeometry(1, 200, 200);
     const mat = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, uniforms });
     const orb = new THREE.Mesh(geo, mat);
     scene.add(orb);
 
-    const tex = haloTexture();
-    const halo = new THREE.Sprite(
-      new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }),
-    );
-    halo.scale.setScalar(2.9);
-    halo.position.z = -1;
-    scene.add(halo);
+    // Partículas: caixa larga atrás da orbe, cada uma com sua velocidade.
+    const N = 1100;
+    const pos = new Float32Array(N * 3);
+    const speed = new Float32Array(N);
+    let seed = 11;
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < N; i++) {
+      pos[i * 3] = (rnd() - 0.5) * 16;
+      pos[i * 3 + 1] = (rnd() - 0.5) * 8;
+      pos[i * 3 + 2] = -1.5 - rnd() * 5;
+      speed[i] = 0.004 + rnd() * 0.012;
+    }
+    const pgeo = new THREE.BufferGeometry();
+    pgeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const pmat = new THREE.PointsMaterial({ size: 0.035, transparent: true, depthWrite: false, opacity: 0.55 });
+    const particles = new THREE.Points(pgeo, pmat);
+    scene.add(particles);
 
+    const paint = () => {
+      const d = isDark();
+      uniforms.dark.value = d ? 1 : 0;
+      pmat.color.set(d ? '#8fa0c8' : '#7b8496');
+      pmat.opacity = d ? 0.5 : 0.45;
+    };
+    paint();
+    const mo = new MutationObserver(() => {
+      paint();
+      renderer.render(scene, camera);
+    });
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+    let halfW = 1;
+    let halfH = 1;
+    let wide = true;
     const size = () => {
       const w = el.clientWidth;
       const h = el.clientHeight;
@@ -136,6 +156,10 @@ export function AiOrb({ className }: { className?: string }) {
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
+      halfH = Math.tan(THREE.MathUtils.degToRad(17.5)) * 7;
+      halfW = halfH * camera.aspect;
+      wide = w >= 1024;
+      orb.scale.setScalar(wide ? Math.min(1.35, halfH * 0.5) : Math.min(0.95, halfW * 0.62));
       renderer.render(scene, camera);
     };
     const ro = new ResizeObserver(size);
@@ -144,37 +168,39 @@ export function AiOrb({ className }: { className?: string }) {
 
     let mx = 0;
     let my = 0;
-    let energyTarget = 0;
     const onMove = (e: PointerEvent) => {
       mx = e.clientX / window.innerWidth - 0.5;
       my = e.clientY / window.innerHeight - 0.5;
-      const r = el.getBoundingClientRect();
-      const dx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
-      const dy = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
-      energyTarget = Math.max(0, 1 - Math.hypot(dx, dy));
     };
     window.addEventListener('pointermove', onMove);
 
     let visible = true;
     let raf = 0;
     const t0 = performance.now();
+    const frame = (move: boolean) => {
+      const t = (performance.now() - t0) / 1000;
+      uniforms.t.value = t;
+      const bx = wide ? halfW * 0.48 : 0;
+      const by = wide ? 0 : halfH * 0.42;
+      orb.position.x = bx + (move ? Math.sin(t * 0.21) * 0.12 : 0);
+      orb.position.y = by + (move ? Math.cos(t * 0.17) * 0.1 : 0);
+      orb.rotation.y += (mx * 0.6 - orb.rotation.y) * 0.03 + 0.0008;
+      orb.rotation.x += (my * 0.35 - orb.rotation.x) * 0.03;
+      if (move) {
+        for (let i = 0; i < N; i++) {
+          pos[i * 3] += speed[i];
+          if (pos[i * 3] > 8) pos[i * 3] = -8;
+        }
+        pgeo.attributes.position.needsUpdate = true;
+      }
+      particles.position.x = -mx * 0.3;
+      particles.position.y = my * 0.2;
+      renderer.render(scene, camera);
+    };
     const loop = () => {
       cancelAnimationFrame(raf);
       if (!visible) return;
-      const t = (performance.now() - t0) / 1000;
-      uniforms.t.value = t;
-      uniforms.energy.value += (energyTarget - uniforms.energy.value) * 0.05;
-      // deriva lenta (a orbe "passeia" atrás do título) + paralaxe da rolagem
-      orb.position.x = Math.sin(t * 0.21) * 0.18;
-      orb.position.y = Math.cos(t * 0.17) * 0.12;
-      halo.position.x = orb.position.x;
-      halo.position.y = orb.position.y;
-      const sy = Math.min(window.scrollY, window.innerHeight * 1.2);
-      el.style.transform = `translate3d(0, ${sy * 0.35}px, 0) scale(${1 - sy / (window.innerHeight * 6)})`;
-      el.style.opacity = String(Math.max(0, 1 - sy / (window.innerHeight * 0.95)));
-      orb.rotation.y += (mx * 0.6 - orb.rotation.y) * 0.03 + 0.0008;
-      orb.rotation.x += (my * 0.35 - orb.rotation.x) * 0.03;
-      renderer.render(scene, camera);
+      frame(true);
       raf = requestAnimationFrame(loop);
     };
     const io = new IntersectionObserver(([e]) => {
@@ -182,17 +208,19 @@ export function AiOrb({ className }: { className?: string }) {
       if (visible && !reduce) loop();
     });
     io.observe(el);
-    if (!reduce) loop();
+    if (reduce) frame(false);
+    else loop();
 
     return () => {
       cancelAnimationFrame(raf);
       ro.disconnect();
       io.disconnect();
+      mo.disconnect();
       window.removeEventListener('pointermove', onMove);
       geo.dispose();
       mat.dispose();
-      tex.dispose();
-      halo.material.dispose();
+      pgeo.dispose();
+      pmat.dispose();
       renderer.dispose();
       renderer.domElement.remove();
     };

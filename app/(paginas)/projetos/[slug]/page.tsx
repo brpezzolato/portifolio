@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Markdown } from '@/components/site/markdown';
-import { PostList } from '@/components/site/lists';
 import { Reveal } from '@/components/site/reveal';
 import { getPosts, getProject } from '@/lib/content';
 import { projectStatusLabel } from '@/lib/format';
@@ -72,7 +71,15 @@ export default async function ProjectPage({ params }: PageProps<'/projetos/[slug
       {related.length > 0 && (
         <section className="mt-20">
           <h2 className="mb-6 text-sm text-muted-foreground">Diário do projeto</h2>
-          <PostList posts={related} />
+          <ul className="border-t border-border">
+            {related.map((r) => (
+              <li key={r.slug}>
+                <Link href={`/novidades/${r.slug}`} className="flex justify-between gap-6 border-b border-border py-4 hover:text-signal">
+                  <span>{r.title}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
     </article>

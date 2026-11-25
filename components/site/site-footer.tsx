@@ -1,11 +1,15 @@
-import { site } from '@/lib/site';
+'use client';
+
+import { site, ui } from '@/lib/site';
+import { useLang } from './providers';
 
 export function SiteFooter() {
+  const { t } = useLang();
   return (
-    <footer className="mx-auto max-w-2xl px-5 pt-10 pb-10 text-sm text-muted-foreground">
-      <div className="flex justify-between border-t border-border pt-6">
+    <footer className="mx-auto max-w-[1280px] px-5 pb-10 sm:px-8">
+      <div className="flex flex-col justify-between gap-3 border-t border-border pt-6 text-sm text-muted-foreground sm:flex-row">
         <span>© {new Date().getFullYear()} {site.name}</span>
-        <span>Feito com cuidado</span>
+        <span>{t(ui.rights)}</span>
       </div>
     </footer>
   );

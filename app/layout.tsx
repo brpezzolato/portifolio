@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { connection } from 'next/server';
+import { headers } from 'next/headers';
+import { Providers } from '@/components/site/providers';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import { SiteHeader } from '@/components/site/site-header';
@@ -14,14 +16,17 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: '#030303',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#faf9f6' },
+    { media: '(prefers-color-scheme: dark)', color: '#030303' },
+  ],
 };
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title: { default: `${site.name} — ${site.role}`, template: `%s · ${site.name}` },
-  description: site.intro,
-  openGraph: { type: 'website', title: site.name, description: site.intro },
+  title: { default: `${site.name} — Ciência de Dados`, template: `%s · ${site.name}` },
+  description: site.intro.pt,
+  openGraph: { type: 'website', title: site.name, description: site.intro.pt },
   formatDetection: { telephone: false },
 };
 
@@ -31,8 +36,11 @@ export const instant = false;
 
 export default async function RootLayout({ children }: LayoutProps<'/'>) {
   await connection();
+  // nonce da CSP (proxy.ts), repassado ao script do tema (next-themes)
+  const csp = (await headers()).get('content-security-policy') ?? '';
+  const nonce = csp.match(/'nonce-([^']+)'/)?.[1];
   return (
-    <html lang="pt-BR" className="dark" suppressHydrationWarning>
+    <html lang="pt-BR" suppressHydrationWarning>
       <body
         className={`${GeistSans.variable} ${GeistMono.variable} min-h-dvh overflow-x-clip font-sans antialiased`}
       >
@@ -40,11 +48,13 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
         <div aria-hidden className="site-grain" />
         <Preloader />
         <SmoothScroll />
+        <Providers nonce={nonce}>
         <TooltipProvider>
           <SiteHeader />
           <main>{children}</main>
           <SiteFooter />
         </TooltipProvider>
+        </Providers>
       </body>
     </html>
   );
