@@ -1,40 +1,63 @@
 'use client';
 
+import { motion, useScroll, useTransform } from 'motion/react';
+import { useRef } from 'react';
 import { useLang } from '@/components/site/providers';
 import { Reveal } from '@/components/site/reveal';
 import { site, ui } from '@/lib/site';
 import { wrap } from './shared';
 
-/* Jornada em linhas largas: número, tipo, título enorme e instituição.
-   No hover a linha se inverte (fundo escuro, texto claro). */
+/* Jornada como capítulos: um trilho horizontal no alto se preenche com a
+   rolagem e acende o marcador de cada etapa; embaixo de cada marcador, um
+   cartão com número grande vazado, tipo, título, instituição e descrição.
+   No celular, o trilho vira vertical à esquerda. */
 export function Journey() {
   const { t } = useLang();
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.85', 'end 0.55'] });
+  const fill = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
+  const items = site.journey;
+
   return (
-    <section id="jornada" className="scroll-mt-10 py-20 sm:py-28">
+    <section id="jornada" className="scroll-mt-16 py-20 sm:py-28">
       <div className={wrap}>
-        <Reveal>
-          <h2 className="mb-10 text-[clamp(2.5rem,6vw,5rem)] leading-none font-semibold tracking-[-0.05em]">{t(ui.journeyTitle)}</h2>
+        <Reveal className="mb-14 flex flex-wrap items-end justify-between gap-6">
+          <h2 className="text-[clamp(2.5rem,6vw,5rem)] leading-none font-semibold tracking-[-0.05em]">{t(ui.journeyTitle)}</h2>
+          <p className="font-mono text-sm text-muted-foreground">({String(items.length).padStart(2, '0')})</p>
         </Reveal>
-        <ol className="border-t border-foreground">
-          {site.journey.map((j, i) => (
-            <li key={i}>
-              <Reveal delay={i * 0.06}>
-                <div className="group relative grid gap-3 overflow-hidden border-b border-foreground py-8 sm:grid-cols-12 sm:items-baseline sm:gap-6 sm:py-10">
-                  <span aria-hidden className="absolute inset-0 origin-bottom scale-y-0 bg-foreground transition-transform duration-500 ease-[cubic-bezier(.22,.9,.28,1)] group-hover:scale-y-100" />
-                  <span className="relative font-mono text-sm text-muted-foreground transition-colors group-hover:text-background/60 sm:col-span-1">
-                    {String(i + 1).padStart(2, '0')}
+
+        <div ref={ref} className="relative">
+          {/* trilho: horizontal no desktop, vertical no celular */}
+          <div aria-hidden className="absolute top-0 left-[11px] h-full w-px bg-border md:top-[11px] md:left-0 md:h-px md:w-full" />
+          <motion.div aria-hidden style={{ height: fill }} className="absolute top-0 left-[11px] w-px bg-signal md:hidden" />
+          <motion.div aria-hidden style={{ width: fill }} className="absolute top-[11px] left-0 hidden h-px bg-signal md:block" />
+
+          <ol className={`grid gap-10 md:gap-8 ${items.length > 1 ? 'md:grid-cols-2' : ''} ${items.length > 2 ? 'lg:grid-cols-3' : ''}`}>
+              {items.map((j, i) => (
+                <li key={i} className="relative pl-12 md:pt-14 md:pl-0">
+                  <span className="absolute top-0 left-0 grid size-[23px] place-items-center rounded-full border border-signal bg-background">
+                    <span className="size-2 rounded-full bg-signal" />
                   </span>
-                  <span className="relative text-sm text-signal sm:col-span-2">{t(j.kind)}</span>
-                  <h3 className="relative text-3xl font-medium tracking-[-0.04em] transition-colors group-hover:text-background sm:col-span-5 sm:text-5xl">{t(j.title)}</h3>
-                  <span className="relative transition-colors group-hover:text-background sm:col-span-4 sm:text-right">
-                    <span className="block font-medium">{typeof j.org === 'string' ? j.org : t(j.org)}</span>
-                    <span className="block text-sm text-muted-foreground transition-colors group-hover:text-background/60">{t(j.text)}</span>
-                  </span>
-                </div>
-              </Reveal>
-            </li>
-          ))}
-        </ol>
+                  <Reveal delay={i * 0.12} className="h-full">
+                    <article className="h-full rounded-[2rem] border border-border bg-card p-7 sm:p-9">
+                      <div className="flex items-start justify-between gap-4">
+                        <span className="rounded-full bg-signal/10 px-3 py-1 text-sm text-signal">{t(j.kind)}</span>
+                        <span
+                          aria-hidden
+                          className="text-[4.5rem] leading-[0.8] font-semibold tracking-[-0.06em] text-transparent [-webkit-text-stroke:1px_var(--border)] sm:text-[6rem]"
+                        >
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                      </div>
+                      <h3 className="mt-10 text-3xl font-medium tracking-[-0.04em] sm:text-4xl">{t(j.title)}</h3>
+                      <p className="mt-2 font-medium text-foreground/80">{typeof j.org === 'string' ? j.org : t(j.org)}</p>
+                      <p className="mt-6 max-w-md text-pretty text-muted-foreground">{t(j.text)}</p>
+                    </article>
+                  </Reveal>
+                </li>
+              ))}
+          </ol>
+        </div>
       </div>
     </section>
   );
