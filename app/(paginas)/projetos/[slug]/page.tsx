@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Markdown } from '@/components/site/markdown';
-import { PostTimeline } from '@/components/site/post-timeline';
+import { PostList } from '@/components/site/lists';
 import { Reveal } from '@/components/site/reveal';
 import { getPosts, getProject } from '@/lib/content';
 import { projectStatusLabel } from '@/lib/format';
@@ -38,7 +38,7 @@ export default async function ProjectPage({ params }: PageProps<'/projetos/[slug
             </Badge>
             <span className="font-mono text-xs text-muted-foreground">{project.year}</span>
           </div>
-          <h1 className="text-sheen mt-4 text-4xl font-semibold tracking-[-0.035em] sm:text-6xl">
+          <h1 className="mt-4 text-4xl font-medium tracking-[-0.04em] sm:text-5xl">
             {project.title}
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-pretty text-muted-foreground">{project.summary}</p>
@@ -71,8 +71,8 @@ export default async function ProjectPage({ params }: PageProps<'/projetos/[slug
       </Reveal>
       {related.length > 0 && (
         <section className="mt-20">
-          <h2 className="mb-6 text-lg font-medium tracking-tight">Diário do projeto</h2>
-          <PostTimeline posts={related} />
+          <h2 className="mb-6 text-sm text-muted-foreground">Diário do projeto</h2>
+          <PostList posts={related} />
         </section>
       )}
     </article>

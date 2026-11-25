@@ -4,21 +4,12 @@ export const site = {
   handle: 'brpezzolato',
   role: 'Ciência de Dados & IA',
   location: 'Brasil',
-  hello: 'Oi, eu sou o Bruno.',
-  headline: ['Dados que', 'viram decisão.'],
+  tagline: 'Dados que viram decisão.',
+  short: 'Estudante de Ciência de Dados e assistente de dados no Instituto Conhecimento Liberta.',
   intro:
     'Estudante de Ciência de Dados e assistente de dados no Instituto Conhecimento Liberta. Aqui eu publico o que estou construindo e aprendendo.',
-  study: 'Estudante de Ciência de Dados',
-  work: 'Assistente de dados no Instituto Conhecimento Liberta',
   manifesto:
     'Sou o Bruno. Estudo Ciência de Dados e trabalho como assistente de dados no Instituto Conhecimento Liberta. Gosto de pegar dados bagunçados e transformar em algo que ajuda alguém a decidir: um gráfico, um modelo, um produto.',
-  /* O que estou fazendo agora (só fatos). */
-  doing: [
-    { verb: 'Estudando', what: 'Ciência de Dados', note: 'Estudante' },
-    { verb: 'Trabalhando', what: 'Instituto Conhecimento Liberta', note: 'Assistente de dados' },
-    { verb: 'Construindo', what: 'Vetra', note: 'Um app que mostra seu dinheiro por inteiro' },
-  ],
-  tags: ['Ciência de Dados', 'Instituto Conhecimento Liberta', 'Vetra', 'IA', 'Next.js', 'Supabase'],
   now: 'Construindo o Vetra, um app que mostra seu dinheiro por inteiro.',
   email: 'contato@exemplo.com',
   links: [

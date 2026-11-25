@@ -20,7 +20,7 @@ export default async function PostPage({ params }: PageProps<'/novidades/[slug]'
   const post = await getPost((await params).slug);
   if (!post) notFound();
   return (
-    <article className="mx-auto max-w-2xl pt-6">
+    <article className="pt-6">
       <Link href="/novidades" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
         <ArrowLeft className="size-3.5" /> Novidades
       </Link>
@@ -32,7 +32,7 @@ export default async function PostPage({ params }: PageProps<'/novidades/[slug]'
               {formatDate(post.publishedAt)}
             </time>
           </div>
-          <h1 className="mt-4 text-3xl font-semibold tracking-[-0.03em] text-balance sm:text-5xl">{post.title}</h1>
+          <h1 className="mt-4 text-3xl font-medium tracking-[-0.04em] text-balance sm:text-5xl">{post.title}</h1>
           <p className="mt-4 text-lg text-muted-foreground">{post.excerpt}</p>
           {post.projectSlug && (
             <Link href={`/projetos/${post.projectSlug}`} className="mt-4 inline-block font-mono text-xs tracking-wider text-muted-foreground uppercase hover:text-foreground">

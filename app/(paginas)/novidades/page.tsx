@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { PostTimeline } from '@/components/site/post-timeline';
+import { PostList } from '@/components/site/lists';
 import { Reveal } from '@/components/site/reveal';
 import { getPosts } from '@/lib/content';
 
@@ -10,17 +10,10 @@ export default async function PostsPage() {
   return (
     <>
       <Reveal>
-        <header className="pt-10 pb-12">
-          <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">Changelog pessoal</p>
-          <h1 className="text-sheen mt-2 text-4xl font-semibold tracking-[-0.035em] sm:text-5xl">Novidades</h1>
-          <p className="mt-4 max-w-xl text-muted-foreground">
-            Lançamentos, atualizações e notas rápidas, em ordem do mais novo.
-          </p>
-        </header>
+        <h1 className="text-3xl font-medium tracking-[-0.04em]">Novidades</h1>
+        <p className="mt-2 mb-12 text-muted-foreground">Lançamentos, atualizações e notas, do mais novo ao mais antigo.</p>
       </Reveal>
-      <Reveal delay={0.05}>
-        <PostTimeline posts={posts} />
-      </Reveal>
+      <PostList posts={posts} />
     </>
   );
 }

@@ -4,31 +4,33 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { nav, site } from '@/lib/site';
 import { cn } from 'cn';
-import { LiveClock } from './live-clock';
 
-/* Cabeçalho mínimo em três pontas: nome, navegação e relógio, sobre um
-   degradê que esmaece o conteúdo que passa por baixo. */
+/* Cabeçalho mínimo: nome à esquerda, dois links à direita. */
 export function SiteHeader() {
   const pathname = usePathname();
   const active = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
   return (
-    <header className="fixed inset-x-0 top-0 z-50 bg-gradient-to-b from-background from-40% via-background/85 to-transparent pb-6">
-      <div className="mx-auto grid max-w-[1400px] grid-cols-[1fr_auto] items-center gap-4 px-5 pt-[max(1.1rem,env(safe-area-inset-top))] pb-3 text-sm sm:grid-cols-3 sm:px-8">
+    <header className="fixed inset-x-0 top-0 z-50 bg-gradient-to-b from-background from-40% to-transparent pb-6">
+      <div className="mx-auto flex max-w-2xl items-center justify-between px-5 pt-[max(1.25rem,env(safe-area-inset-top))] text-sm">
         <Link href="/" className="font-medium tracking-tight">
           {site.name}
         </Link>
-        <nav aria-label="Principal" className="flex gap-5 sm:justify-center">
+        <nav aria-label="Principal" className="flex gap-6">
           {nav.slice(1).map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={cn('transition-opacity hover:opacity-100', active(item.href) ? 'opacity-100' : 'opacity-60')}
+              className={cn(
+                'relative transition-colors after:absolute after:inset-x-0 after:-bottom-1 after:h-px after:origin-left after:bg-foreground after:transition-transform after:duration-500',
+                active(item.href)
+                  ? 'text-foreground after:scale-x-100'
+                  : 'text-muted-foreground after:scale-x-0 hover:text-foreground hover:after:scale-x-100',
+              )}
             >
               {item.label}
             </Link>
           ))}
         </nav>
-        <LiveClock className="hidden justify-self-end font-mono text-xs opacity-60 sm:block" />
       </div>
     </header>
   );

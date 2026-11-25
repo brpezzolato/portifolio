@@ -144,13 +144,9 @@ html {
   background:
     radial-gradient(
       60rem 30rem at 50% -10rem,
-      color-mix(in oklch, var(--foreground) 9%, transparent),
+      color-mix(in oklch, var(--foreground) 6%, transparent),
       transparent 70%
-    ),
-    linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 64px 64px,
-    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 64px
-      64px;
-  mask-image: radial-gradient(ellipse at 50% 0%, #000 30%, transparent 75%);
+    );
 }
 
 /* Granulado por cima de tudo: tira a cara de "tela chapada". */
@@ -267,5 +263,15 @@ html.lenis body {
 @keyframes blink {
   50% {
     opacity: 0;
+  }
+}
+
+/* Fio de "role para baixo" no herói */
+@keyframes drip {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(200%);
   }
 }

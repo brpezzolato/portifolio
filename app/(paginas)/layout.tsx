@@ -1,4 +1,4 @@
-/* Páginas internas: coluna centralizada abaixo do cabeçalho fixo. */
+/* Páginas internas: a mesma coluna estreita da home. */
 export default function PaginasLayout({ children }: LayoutProps<'/'>) {
-  return <div className="mx-auto w-full max-w-5xl px-5 pt-32 pb-24 sm:px-8">{children}</div>;
+  return <div className="mx-auto w-full max-w-2xl px-5 pt-32 pb-24">{children}</div>;
 }

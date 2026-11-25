@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ProjectCard } from '@/components/site/project-card';
+import { ProjectList } from '@/components/site/lists';
 import { Reveal } from '@/components/site/reveal';
 import { getProjects } from '@/lib/content';
 
@@ -10,26 +10,10 @@ export default async function ProjectsPage() {
   return (
     <>
       <Reveal>
-        <header className="pt-10 pb-12">
-          <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
-            {projects.length} projetos
-          </p>
-          <h1 className="text-sheen mt-2 text-4xl font-semibold tracking-[-0.035em] sm:text-5xl">
-            Projetos
-          </h1>
-          <p className="mt-4 max-w-xl text-muted-foreground">
-            Tudo o que eu construí ou estou construindo — do rascunho ao que já
-            está no ar.
-          </p>
-        </header>
+        <h1 className="text-3xl font-medium tracking-[-0.04em]">Projetos</h1>
+        <p className="mt-2 mb-12 text-muted-foreground">O que eu construí e o que estou construindo.</p>
       </Reveal>
-      <div className="grid gap-4 sm:grid-cols-2">
-        {projects.map((p, i) => (
-          <Reveal key={p.slug} delay={i * 0.05}>
-            <ProjectCard project={p} />
-          </Reveal>
-        ))}
-      </div>
+      <ProjectList projects={projects} />
     </>
   );
 }
