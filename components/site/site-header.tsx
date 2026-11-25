@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { motion } from 'motion/react';
 import { useTheme } from 'next-themes';
 import { Menu, Moon, Sun } from 'lucide-react';
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -9,14 +10,15 @@ import { nav, site, ui } from '@/lib/site';
 import { cn } from 'cn';
 import { useLang } from './providers';
 
-/* Barra no topo, de ponta a ponta: iniciais, links das seções (com
-   sublinhado que desliza) e idioma/tema. Transparente no início; ao rolar,
-   ganha fundo de vidro e uma linha fina embaixo. No celular, menu em gaveta. */
+/* Navegação em pílula flutuante, de vidro líquido (app/glass.css): iniciais,
+   links das seções com uma "gota" que segue o mouse, idioma e tema. Ao rolar,
+   a pílula encolhe um pouco. No celular, os links vão para uma gaveta. */
 export function SiteHeader() {
   const { t, lang, setLang } = useLang();
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hover, setHover] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -27,77 +29,92 @@ export function SiteHeader() {
   }, []);
 
   const Lang = (
-    <div className="flex items-center text-sm">
-      {(['pt', 'en'] as const).map((l, i) => (
-        <span key={l} className="flex items-center">
-          {i > 0 && <span className="px-1 text-muted-foreground/40">/</span>}
-          <button
-            type="button"
-            onClick={() => setLang(l)}
-            aria-pressed={lang === l}
-            className={cn('uppercase transition-colors', lang === l ? 'text-foreground' : 'text-muted-foreground hover:text-foreground')}
-          >
-            {l}
-          </button>
-        </span>
+    <div className="flex items-center rounded-full bg-foreground/5 p-0.5 text-xs">
+      {(['pt', 'en'] as const).map((l) => (
+        <button
+          key={l}
+          type="button"
+          onClick={() => setLang(l)}
+          aria-pressed={lang === l}
+          className={cn(
+            'rounded-full px-2 py-1 uppercase transition-colors',
+            lang === l ? 'bg-foreground text-background' : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          {l}
+        </button>
       ))}
     </div>
   );
 
   return (
-    <header
-      className={cn(
-        'fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-500',
-        scrolled ? 'border-b border-border bg-background/70 backdrop-blur-xl' : 'border-b border-transparent',
-      )}
-    >
-      <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-5 pt-[env(safe-area-inset-top)] sm:px-8">
-        <Link href="/#inicio" className="text-sm font-semibold tracking-tight">
-          {site.name}
-          <span className="text-signal">.</span>
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-3 pt-[max(0.9rem,env(safe-area-inset-top))]">
+      <div
+        className={cn(
+          'glass glass-bar glass-lens glass-static pointer-events-auto flex items-center gap-1 transition-[padding] duration-500',
+          scrolled ? 'p-1' : 'p-1.5',
+        )}
+      >
+        <Link
+          href="/#inicio"
+          aria-label={site.name}
+          className="grid size-9 shrink-0 place-items-center rounded-full bg-foreground text-xs font-semibold text-background transition-transform hover:scale-105"
+        >
+          {site.initials}
         </Link>
 
-        <nav aria-label="Principal" className="hidden items-center gap-8 md:flex">
-          {nav.slice(1).map((n) => (
-            <Link
-              key={n.key}
-              href={n.href}
-              className="relative text-sm text-muted-foreground transition-colors after:absolute after:inset-x-0 after:-bottom-1 after:h-px after:origin-right after:scale-x-0 after:bg-foreground after:transition-transform after:duration-500 hover:text-foreground hover:after:origin-left hover:after:scale-x-100"
-            >
-              {t(ui.nav[n.key])}
-            </Link>
-          ))}
+        <nav aria-label="Principal" className="hidden md:block" onPointerLeave={() => setHover(null)}>
+          <ul className="flex items-center">
+            {nav.slice(1).map((n) => (
+              <li key={n.key} className="relative">
+                <Link
+                  href={n.href}
+                  onPointerEnter={() => setHover(n.key)}
+                  className="relative z-10 block rounded-full px-3.5 py-2 text-sm text-foreground/70 transition-colors hover:text-foreground"
+                >
+                  {t(ui.nav[n.key])}
+                </Link>
+                {hover === n.key && (
+                  <motion.span
+                    layoutId="nav-drop"
+                    className="absolute inset-0 rounded-full bg-foreground/[0.07] ring-1 ring-foreground/10"
+                    transition={{ type: 'spring', bounce: 0.25, duration: 0.45 }}
+                  />
+                )}
+              </li>
+            ))}
+          </ul>
         </nav>
 
-        <div className="flex items-center gap-4">
-          <div className="hidden sm:block">{Lang}</div>
-          <button
-            type="button"
-            aria-label={t(ui.theme)}
-            onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-            className="grid size-9 place-items-center rounded-full transition-colors hover:bg-foreground/5"
+        <span className="mx-1 hidden h-5 w-px bg-foreground/10 md:block" />
+        <div className="hidden sm:block">{Lang}</div>
+        <button
+          type="button"
+          aria-label={t(ui.theme)}
+          onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+          className="grid size-9 place-items-center rounded-full transition-colors hover:bg-foreground/[0.07]"
+        >
+          {mounted && resolvedTheme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
+        </button>
+
+        <Sheet>
+          <SheetTrigger
+            render={<button type="button" aria-label={t(ui.menu)} className="grid size-9 place-items-center rounded-full hover:bg-foreground/[0.07] md:hidden" />}
           >
-            {mounted && resolvedTheme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
-          </button>
-          <Sheet>
-            <SheetTrigger
-              render={<button type="button" aria-label={t(ui.menu)} className="grid size-9 place-items-center rounded-full hover:bg-foreground/5 md:hidden" />}
-            >
-              <Menu className="size-5" />
-            </SheetTrigger>
-            <SheetContent side="right" className="p-6">
-              <SheetTitle className="text-sm text-muted-foreground">{t(ui.menu)}</SheetTitle>
-              <nav className="mt-6 flex flex-col">
-                {nav.slice(1).map((n) => (
-                  <SheetClose key={n.key} render={<Link href={n.href} className="border-b border-border py-4 text-2xl font-medium tracking-tight" />}>
-                    {t(ui.nav[n.key])}
-                  </SheetClose>
-                ))}
-              </nav>
-              <div className="mt-6">{Lang}</div>
-            </SheetContent>
-          </Sheet>
-        </div>
+            <Menu className="size-5" />
+          </SheetTrigger>
+          <SheetContent side="right" className="p-6">
+            <SheetTitle className="text-sm text-muted-foreground">{t(ui.menu)}</SheetTitle>
+            <nav className="mt-6 flex flex-col">
+              {nav.slice(1).map((n) => (
+                <SheetClose key={n.key} render={<Link href={n.href} className="border-b border-border py-4 text-2xl font-medium tracking-tight" />}>
+                  {t(ui.nav[n.key])}
+                </SheetClose>
+              ))}
+            </nav>
+            <div className="mt-6">{Lang}</div>
+          </SheetContent>
+        </Sheet>
       </div>
     </header>
   );

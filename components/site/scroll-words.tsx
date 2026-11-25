@@ -1,12 +1,25 @@
 'use client';
 
 import { motion, useScroll, useTransform, type MotionValue } from 'motion/react';
-import { useRef } from 'react';
+import { useRef, type RefObject } from 'react';
 
 /* Parágrafo que se preenche palavra a palavra conforme a rolagem. */
-export function ScrollWords({ text, className }: { text: string; className?: string }) {
+/* Por padrão acompanha o próprio parágrafo; com `target`, acompanha outro
+   elemento (útil quando o parágrafo fica preso com position: sticky). */
+export function ScrollWords({
+  text,
+  className,
+  target,
+  offset = ['start 0.85', 'end 0.4'],
+}: {
+  text: string;
+  className?: string;
+  target?: RefObject<HTMLElement | null>;
+  offset?: [string, string];
+}) {
   const ref = useRef<HTMLParagraphElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.85', 'end 0.4'] });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { scrollYProgress } = useScroll({ target: target ?? ref, offset: offset as any });
   const words = text.split(' ');
   return (
     <p ref={ref} className={className}>

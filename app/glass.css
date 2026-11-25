@@ -416,3 +416,26 @@
   }
 }
 
+
+/* Barra de navegação: vidro líquido completo (aro, brilho, lente), mas sem
+   "afundar" ao clicar — quem reage ao toque são os links dentro dela. */
+.glass.glass-static:active {
+  transform: none;
+  background-color: var(--glass-tint);
+  box-shadow:
+    inset 0 0.5px 0 0 var(--glass-rim-top),
+    inset 0 1.5px 2px -2px var(--glass-rim-top),
+    inset 0 -0.5px 0 0 var(--glass-rim-bottom),
+    inset 0 -1.5px 2px -2px var(--glass-rim-exit),
+    inset 0 0 0 0.5px var(--glass-edge),
+    var(--glass-shadow);
+}
+.glass.glass-static:active::after {
+  opacity: 0.55;
+  transform: none;
+}
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .glass.glass-static.glass-lens:active {
+    background-color: color-mix(in srgb, var(--glass-tint) 62%, transparent);
+  }
+}
