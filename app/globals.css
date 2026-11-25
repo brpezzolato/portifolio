@@ -275,3 +275,31 @@ html.lenis body {
     transform: translateY(200%);
   }
 }
+
+/* Preenchimento automático (Chrome, Edge, Safari, Firefox): os navegadores
+   pintam o campo de azul/amarelo e trocam a cor do texto. Aqui o campo fica
+   exatamente como foi desenhado. A cor do texto vem de --autofill-ink
+   (padrão: a cor do texto do site). */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill {
+  -webkit-text-fill-color: var(--autofill-ink, var(--foreground)) !important;
+  caret-color: var(--autofill-ink, var(--foreground));
+  font: inherit;
+  /* o fundo do navegador "demora" dias para aparecer, ou seja, nunca */
+  transition:
+    background-color 9999999s ease-out 0s,
+    color 9999999s ease-out 0s;
+}
+input:autofill,
+textarea:autofill,
+select:autofill {
+  filter: none !important;
+  background-image: none !important;
+  -webkit-text-fill-color: var(--autofill-ink, var(--foreground)) !important;
+}

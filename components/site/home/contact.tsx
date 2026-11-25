@@ -17,7 +17,7 @@ import { wrap } from './shared';
    no meio do texto ("Oi, Bruno! Meu nome é ___ …"). Os componentes são os
    do shadcn, só com a aparência trocada. */
 const gap =
-  'inline-flex h-auto min-w-0 rounded-none border-0 border-b-2 border-foreground/20 bg-transparent px-1 py-0 align-baseline text-[length:inherit] font-medium md:text-[length:inherit] tracking-[inherit] text-signal shadow-none transition-colors placeholder:text-foreground/25 focus-visible:border-signal focus-visible:ring-0 dark:bg-transparent';
+  'inline-flex h-auto min-w-0 rounded-none border-0 border-b-2 border-foreground/20 bg-transparent px-1 py-0 align-baseline text-[length:inherit] font-medium md:text-[length:inherit] tracking-[inherit] text-signal [--autofill-ink:var(--signal)] shadow-none transition-[border-color] placeholder:text-foreground/25 focus-visible:border-signal focus-visible:ring-0 dark:bg-transparent';
 
 export function Contact() {
   const { t } = useLang();

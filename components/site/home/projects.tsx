@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'motion/react';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { useLang } from '@/components/site/providers';
 import { Reveal } from '@/components/site/reveal';
@@ -16,8 +16,26 @@ import { wrap } from './shared';
 export function Projects({ projects }: { projects: Project[] }) {
   const { t } = useLang();
   const ref = useRef<HTMLDivElement>(null);
+  const track = useRef<HTMLUListElement>(null);
+  // Distância exata que o trilho precisa andar para o último cartão chegar
+  // à margem direita (a mesma folga da esquerda). Nem um pixel a mais.
+  const [dist, setDist] = useState(0);
+  useEffect(() => {
+    const el = track.current;
+    if (!el) return;
+    // a largura do trilho já inclui a folga dos dois lados
+    const measure = () => setDist(Math.max(0, el.scrollWidth - window.innerWidth));
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    window.addEventListener('resize', measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [projects.length]);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
-  const x = useTransform(scrollYProgress, [0, 1], ['0%', `-${Math.max(0, projects.length - 2) * 34}%`]);
+  const x = useTransform(scrollYProgress, (v) => -v * dist);
 
   const Head = (
     <div className="flex items-end justify-between gap-6">
@@ -35,10 +53,10 @@ export function Projects({ projects }: { projects: Project[] }) {
   return (
     <section id="projetos" className="scroll-mt-0">
       {/* desktop: trilho horizontal */}
-      <div ref={ref} className="relative hidden lg:block" style={{ height: `${100 + projects.length * 45}svh` }}>
+      <div ref={ref} className="relative hidden lg:block" style={{ height: `calc(100svh + ${dist}px)` }}>
         <div className="sticky top-0 flex h-svh flex-col justify-center overflow-hidden">
           <div className={wrap}>{Head}</div>
-          <motion.ul style={{ x }} className="mt-12 flex gap-8 pl-[max(2rem,calc((100vw-1280px)/2+2rem))]">
+          <motion.ul ref={track} style={{ x }} className="mt-12 flex w-max gap-8 px-[max(2rem,calc((100vw-1280px)/2+2rem))]">
             {projects.map((p) => (
               <li key={p.slug} className="w-[30rem] shrink-0">
                 <ProjectCard p={p} />
