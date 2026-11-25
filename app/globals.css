@@ -76,8 +76,8 @@
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
   --radius: 0.75rem;
-  /* Único acento: azul-gelo de IA (a "voz" da orbe e o status ao vivo). */
-  --signal: var(--p-light, #0b8a5e);
+  /* Acento: vermelho rubi forte. */
+  --signal: #d90429;
   --grid-line: oklch(0 0 0 / 5%);
 }
 
@@ -100,7 +100,7 @@
   --border: oklch(1 0 0 / 9%);
   --input: oklch(1 0 0 / 14%);
   --ring: oklch(0.556 0 0);
-  --signal: var(--p-dark, #34d399);
+  --signal: #ff2e3f;
   --grid-line: oklch(1 0 0 / 4%);
 }
 

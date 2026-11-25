@@ -5,7 +5,7 @@ import * as THREE from 'three';
 
 /* Cena do herói, em tela cheia: partículas finas atravessando da esquerda
    para a direita (um fluxo de dados) e, à frente delas, a orbe lisa em
-   shader. A orbe se adapta ao tema: perolada no claro, preta no escuro. */
+   shader. A orbe é branca: perolada no claro, com borda acesa em branco no escuro. */
 
 const NOISE = /* glsl */ `
 vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}
@@ -107,8 +107,9 @@ export function HeroScene({ className }: { className?: string }) {
       t: { value: 0 },
       energy: { value: 0 },
       dark: { value: isDark() ? 1 : 0 },
-      ice: { value: new THREE.Color('#10b981') },
-      violet: { value: new THREE.Color('#06b6d4') },
+      // orbe branca: a borda vai de um cinza-pérola a branco puro
+      ice: { value: new THREE.Color('#c9c9cf') },
+      violet: { value: new THREE.Color('#ffffff') },
     };
     const geo = new THREE.SphereGeometry(1, 200, 200);
     const mat = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, uniforms });
@@ -133,16 +134,7 @@ export function HeroScene({ className }: { className?: string }) {
     const particles = new THREE.Points(pgeo, pmat);
     scene.add(particles);
 
-    // cores da orbe vêm da paleta (variáveis --orb-a/--orb-b no <html>)
-    const readOrb = () => {
-      const cs = getComputedStyle(document.documentElement);
-      const a = cs.getPropertyValue('--orb-a').trim();
-      const b = cs.getPropertyValue('--orb-b').trim();
-      if (a) uniforms.ice.value.set(a);
-      if (b) uniforms.violet.value.set(b);
-    };
     const paint = () => {
-      readOrb();
       const d = isDark();
       uniforms.dark.value = d ? 1 : 0;
       pmat.color.set(d ? '#8fa0c8' : '#7b8496');
@@ -153,12 +145,7 @@ export function HeroScene({ className }: { className?: string }) {
       paint();
       renderer.render(scene, camera);
     });
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'style'] });
-    const onPalette = () => {
-      paint();
-      renderer.render(scene, camera);
-    };
-    window.addEventListener('palette:change', onPalette);
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
     let halfW = 1;
     let halfH = 1;
@@ -230,7 +217,6 @@ export function HeroScene({ className }: { className?: string }) {
       ro.disconnect();
       io.disconnect();
       mo.disconnect();
-      window.removeEventListener('palette:change', onPalette);
       window.removeEventListener('pointermove', onMove);
       geo.dispose();
       mat.dispose();

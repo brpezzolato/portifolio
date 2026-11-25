@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from 'next';
 import { connection } from 'next/server';
 import { headers } from 'next/headers';
 import { Providers } from '@/components/site/providers';
-import { PalettePicker } from '@/components/site/palette';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import { SiteHeader } from '@/components/site/site-header';
@@ -54,7 +53,6 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
           <SiteHeader />
           <main>{children}</main>
           <SiteFooter />
-          <PalettePicker />
         </TooltipProvider>
         </Providers>
       </body>
