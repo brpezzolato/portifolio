@@ -17,6 +17,12 @@ export const site = {
 
   status: { pt: 'Construindo o Vetra', en: 'Building Vetra' } as T,
   tagline: { pt: 'Dados que viram decisão.', en: 'Data that becomes decisions.' } as T,
+  hook: { pt: 'Transformo dados bagunçados em decisões claras.', en: 'I turn messy data into clear decisions.' } as T,
+  chips: [
+    { pt: 'Ciência de Dados', en: 'Data Science' },
+    { pt: 'Instituto Conhecimento Liberta', en: 'Instituto Conhecimento Liberta' },
+    { pt: 'Construindo o Vetra', en: 'Building Vetra' },
+  ] as T[],
   short: {
     pt: 'Ciência de Dados · Instituto Conhecimento Liberta',
     en: 'Data Science · Instituto Conhecimento Liberta',

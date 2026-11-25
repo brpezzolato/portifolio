@@ -17,9 +17,11 @@ const schema = z.object({
    (supabase/migrations/0002), nunca ler: quem lê é você, pelo painel. */
 export async function sendContact(_: ContactState, form: FormData): Promise<ContactState> {
   const parsed = schema.safeParse({
-    name: form.get('name'),
-    email: form.get('email'),
-    message: form.get('message'),
+    // nomes neutros nos campos (c1/c2/c3) para o navegador não reconhecer
+    // e não oferecer autopreenchimento
+    name: form.get('c1'),
+    email: form.get('c2'),
+    message: form.get('c3'),
     website: form.get('website') ?? '',
   });
   if (!parsed.success) {

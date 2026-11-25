@@ -13,7 +13,9 @@ import { site, ui } from '@/lib/site';
 import { cn } from 'cn';
 import { wrap } from './shared';
 
-/* Contato como uma frase para completar: os campos são lacunas sublinhadas
+/* Preenchimento automático desligado aqui de propósito: a prévia de
+   sugestões do Chrome usa fonte e largura próprias que o CSS não alcança.
+   Contato como uma frase para completar: os campos são lacunas sublinhadas
    no meio do texto ("Oi, Bruno! Meu nome é ___ …"). Os componentes são os
    do shadcn, só com a aparência trocada. */
 const gap =
@@ -33,19 +35,19 @@ export function Contact() {
         </Reveal>
 
         <Reveal delay={0.1}>
-          <form action={action} className="relative mt-16 border-t border-border pt-12">
+          <form action={action} autoComplete="off" className="relative mt-16 border-t border-border pt-12">
             <div className="text-[clamp(1.6rem,3.6vw,3.2rem)] leading-[1.45] font-medium tracking-[-0.03em]">
               <span>{t(ui.madHi)} </span>
               <Label htmlFor="c-name" className="sr-only">{t(ui.formName)}</Label>
-              <Input id="c-name" name="name" autoComplete="name" required minLength={2} maxLength={80} placeholder={t(ui.phName)} className={cn(gap, 'w-auto field-sizing-content min-w-[7ch] max-w-full')} />
+              <Input id="c-name" name="c1" type="text" autoComplete="off" autoCorrect="off" spellCheck={false} data-1p-ignore data-lpignore="true" data-form-type="other" required minLength={2} maxLength={80} placeholder={t(ui.phName)} className={cn(gap, 'w-[min(8.5em,100%)]')} />
               <span> {t(ui.madMid)} </span>
               <Label htmlFor="c-email" className="sr-only">{t(ui.formEmail)}</Label>
-              <Input id="c-email" name="email" type="email" autoComplete="email" required maxLength={254} placeholder={t(ui.phEmail)} className={cn(gap, 'w-auto field-sizing-content min-w-[10ch] max-w-full')} />
+              <Input id="c-email" name="c2" type="text" inputMode="email" autoCapitalize="none" autoComplete="off" autoCorrect="off" spellCheck={false} data-1p-ignore data-lpignore="true" data-form-type="other" required maxLength={254} placeholder={t(ui.phEmail)} className={cn(gap, 'w-[min(11em,100%)]')} />
               <span>. {t(ui.madEnd)}</span>
               <Label htmlFor="c-message" className="sr-only">{t(ui.formMessage)}</Label>
               <Textarea
                 id="c-message"
-                name="message"
+                name="c3" autoComplete="off" data-1p-ignore data-lpignore="true"
                 required
                 minLength={10}
                 maxLength={2000}
