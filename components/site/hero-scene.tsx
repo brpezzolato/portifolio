@@ -159,7 +159,7 @@ export function HeroScene({ className }: { className?: string }) {
       halfH = Math.tan(THREE.MathUtils.degToRad(17.5)) * 7;
       halfW = halfH * camera.aspect;
       wide = w >= 1024;
-      orb.scale.setScalar(wide ? Math.min(1.35, halfH * 0.5) : Math.min(0.95, halfW * 0.62));
+      orb.scale.setScalar(wide ? Math.min(1.25, halfH * 0.46) : Math.min(1.0, halfW * 0.7));
       renderer.render(scene, camera);
     };
     const ro = new ResizeObserver(size);
@@ -180,8 +180,8 @@ export function HeroScene({ className }: { className?: string }) {
     const frame = (move: boolean) => {
       const t = (performance.now() - t0) / 1000;
       uniforms.t.value = t;
-      const bx = wide ? halfW * 0.48 : 0;
-      const by = wide ? 0 : halfH * 0.42;
+      const bx = 0;
+      const by = wide ? 0.02 : -halfH * 0.04;
       orb.position.x = bx + (move ? Math.sin(t * 0.21) * 0.12 : 0);
       orb.position.y = by + (move ? Math.cos(t * 0.17) * 0.1 : 0);
       orb.rotation.y += (mx * 0.6 - orb.rotation.y) * 0.03 + 0.0008;

@@ -3,105 +3,82 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
-import { Menu, Moon, Sun } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Moon, Sun } from 'lucide-react';
 import { nav, site, ui } from '@/lib/site';
 import { cn } from 'cn';
 import { useLang } from './providers';
 
-/* Cabeçalho largo: iniciais, âncoras das seções, idioma e tema. Ao rolar,
-   ganha fundo de vidro e encolhe. No celular, o menu abre numa gaveta. */
+/* Topo: só as iniciais e os botões de idioma e tema, soltos nos cantos.
+   Navegação: uma barra flutuante embaixo da tela, que se esconde ao rolar
+   para baixo e volta ao rolar para cima. */
 export function SiteHeader() {
   const { t, lang, setLang } = useLang();
   const { resolvedTheme, setTheme } = useTheme();
-  const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const on = () => setScrolled(window.scrollY > 24);
-    on();
+    let last = window.scrollY;
+    const on = () => {
+      const y = window.scrollY;
+      setHidden(y > last && y > 400);
+      last = y;
+    };
     window.addEventListener('scroll', on, { passive: true });
     return () => window.removeEventListener('scroll', on);
   }, []);
 
-  const LangSwitch = (
-    <div className="flex rounded-full border border-border p-0.5 text-xs">
-      {(['pt', 'en'] as const).map((l) => (
-        <button
-          key={l}
-          type="button"
-          onClick={() => setLang(l)}
-          aria-pressed={lang === l}
-          className={cn(
-            'rounded-full px-2.5 py-1 uppercase transition-colors',
-            lang === l ? 'bg-foreground text-background' : 'text-muted-foreground hover:text-foreground',
-          )}
-        >
-          {l}
-        </button>
-      ))}
-    </div>
-  );
-
-  const ThemeSwitch = (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="rounded-full"
-      aria-label={t(ui.theme)}
-      onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-    >
-      {mounted && resolvedTheme === 'dark' ? <Sun /> : <Moon />}
-    </Button>
-  );
-
   return (
-    <header className="fixed inset-x-0 top-0 z-50 px-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
-      <div
-        className={cn(
-          'mx-auto flex max-w-[1280px] items-center justify-between rounded-full px-4 transition-all duration-500',
-          scrolled ? 'h-14 border border-border bg-background/75 shadow-sm backdrop-blur-xl' : 'h-16 border border-transparent',
-        )}
-      >
-        <Link href="/#inicio" aria-label={site.name} className="grid size-9 place-items-center rounded-full bg-foreground text-xs font-semibold text-background">
+    <>
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-center justify-between px-5 pt-[max(1.1rem,env(safe-area-inset-top))] sm:px-8">
+        <Link href="/#inicio" className="pointer-events-auto text-sm font-semibold tracking-tight">
           {site.initials}
+          <span className="text-signal">.</span>
         </Link>
-
-        <nav aria-label="Principal" className="hidden items-center gap-1 lg:flex">
-          {nav.map((n) => (
-            <Link
-              key={n.key}
-              href={n.href}
-              className="rounded-full px-3.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
+        <div className="pointer-events-auto flex items-center gap-1 text-sm">
+          {(['pt', 'en'] as const).map((l) => (
+            <button
+              key={l}
+              type="button"
+              onClick={() => setLang(l)}
+              aria-pressed={lang === l}
+              className={cn('px-1.5 py-1 uppercase transition-colors', lang === l ? 'text-foreground' : 'text-muted-foreground hover:text-foreground')}
             >
-              {t(ui.nav[n.key])}
-            </Link>
+              {l}
+            </button>
           ))}
-        </nav>
-
-        <div className="flex items-center gap-2">
-          <div className="hidden sm:block">{LangSwitch}</div>
-          {ThemeSwitch}
-          <Sheet>
-            <SheetTrigger render={<Button variant="ghost" size="icon" className="rounded-full lg:hidden" aria-label={t(ui.menu)} />}>
-              <Menu />
-            </SheetTrigger>
-            <SheetContent side="right" className="p-6">
-              <SheetTitle className="text-sm text-muted-foreground">{t(ui.menu)}</SheetTitle>
-              <nav className="mt-6 flex flex-col">
-                {nav.map((n) => (
-                  <SheetClose key={n.key} render={<Link href={n.href} className="border-b border-border py-4 text-2xl font-medium tracking-tight" />}>
-                    {t(ui.nav[n.key])}
-                  </SheetClose>
-                ))}
-              </nav>
-              <div className="mt-6">{LangSwitch}</div>
-            </SheetContent>
-          </Sheet>
+          <button
+            type="button"
+            aria-label={t(ui.theme)}
+            onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+            className="ml-2 grid size-8 place-items-center rounded-full transition-colors hover:bg-foreground/5"
+          >
+            {mounted && resolvedTheme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
+          </button>
         </div>
       </div>
-    </header>
+
+      <nav
+        aria-label="Principal"
+        className={cn(
+          'fixed inset-x-0 bottom-0 z-50 flex justify-center px-3 pb-[max(1rem,env(safe-area-inset-bottom))] transition-transform duration-500 ease-[cubic-bezier(.22,.9,.28,1)]',
+          hidden && 'translate-y-[150%]',
+        )}
+      >
+        <ul className="flex max-w-full gap-0.5 overflow-x-auto rounded-full border border-border bg-background/70 p-1.5 shadow-[0_10px_40px_-15px_rgb(0_0_0/0.35)] backdrop-blur-xl">
+          {nav.slice(1).map((n) => ((
+            <li key={n.key} className={n.key === 'novidades' ? 'hidden sm:block' : undefined}>
+              <Link
+                href={n.href}
+                className="block rounded-full px-2.5 py-2 text-[13px] whitespace-nowrap sm:px-3.5 sm:text-sm text-muted-foreground transition-colors hover:bg-foreground hover:text-background"
+              >
+                {t(ui.nav[n.key])}
+              </Link>
+            </li>
+          )))}
+        </ul>
+      </nav>
+    </>
   );
 }

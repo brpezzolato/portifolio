@@ -1,8 +1,9 @@
 'use client';
 
 import { useActionState } from 'react';
-import { ArrowUpRight, Mail } from 'lucide-react';
+import { ArrowUpRight, PenLine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -18,35 +19,30 @@ export function Contact() {
   const msg = { ok: ui.formOk, invalid: ui.formInvalid, fail: ui.formFail }[state.status as 'ok' | 'invalid' | 'fail'];
 
   return (
-    <section id="contato" className="scroll-mt-24 py-20 sm:py-28">
-      <div className={`${wrap} grid gap-12 lg:grid-cols-12`}>
-        <Reveal className="lg:col-span-5">
-          <h2 className="text-4xl font-semibold tracking-[-0.04em] sm:text-6xl">{t(ui.contactTitle)}</h2>
-          <p className="mt-5 max-w-md text-lg text-muted-foreground">{t(ui.contactText)}</p>
-          <a href={`mailto:${site.email}`} className="group mt-10 flex items-center gap-4">
-            <span className="grid size-12 place-items-center rounded-2xl bg-signal/10 text-signal">
-              <Mail className="size-5" />
-            </span>
-            <span className="text-lg font-medium group-hover:text-signal">{site.email}</span>
-          </a>
-          <ul className="mt-6 flex gap-3">
-            {site.links.map((l) => (
-              <li key={l.href}>
-                <a
-                  href={l.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 rounded-full border border-border px-4 py-2 text-sm transition-colors hover:border-foreground/30"
-                >
-                  {l.label} <ArrowUpRight className="size-3.5" />
-                </a>
-              </li>
-            ))}
-          </ul>
+    <section id="contato" className="scroll-mt-10 py-28 sm:py-40">
+      <div className={`${wrap} text-center`}>
+        <Reveal>
+          <p className="text-sm text-muted-foreground">{t(ui.contactText)}</p>
+          <h2 className="mt-6 text-[clamp(3rem,10vw,9.5rem)] leading-[0.9] font-semibold tracking-[-0.06em]">{t(ui.contactTitle)}</h2>
         </Reveal>
-
-        <Reveal delay={0.1} className="lg:col-span-7">
-          <form action={action} className="rounded-3xl border border-border bg-card p-6 sm:p-8">
+        <Reveal delay={0.1}>
+          <a
+            href={`mailto:${site.email}`}
+            className="group mt-10 inline-flex items-center gap-2 text-[clamp(1.2rem,2.4vw,2rem)] font-medium tracking-tight text-signal"
+          >
+            <span className="relative after:absolute after:inset-x-0 after:-bottom-1 after:h-0.5 after:origin-right after:scale-x-0 after:bg-current after:transition-transform after:duration-500 group-hover:after:origin-left group-hover:after:scale-x-100">
+              {site.email}
+            </span>
+            <ArrowUpRight className="size-6 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
+          </a>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+            <Sheet>
+              <SheetTrigger render={<Button variant="glass" size="pill" />}>
+                <PenLine data-icon="inline-start" /> {t(ui.writeMe)}
+              </SheetTrigger>
+              <SheetContent side="bottom" className="max-h-[90svh] overflow-y-auto rounded-t-[2rem] px-5 pt-8 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-8">
+                <SheetTitle className="mx-auto w-full max-w-2xl text-2xl font-semibold tracking-tight">{t(ui.contactTitle)}</SheetTitle>
+                <form action={action} className="relative mx-auto w-full max-w-2xl">
             <div className="grid gap-5 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="c-name">{t(ui.formName)}</Label>
@@ -77,6 +73,20 @@ export function Contact() {
               )}
             </div>
           </form>
+              </SheetContent>
+            </Sheet>
+            {site.links.map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-10 items-center gap-1 rounded-full border border-border px-5 text-sm transition-colors hover:border-foreground/40"
+              >
+                {l.label} <ArrowUpRight className="size-3.5" />
+              </a>
+            ))}
+          </div>
         </Reveal>
       </div>
     </section>

@@ -17,6 +17,10 @@ export const site = {
 
   status: { pt: 'Construindo o Vetra', en: 'Building Vetra' } as T,
   tagline: { pt: 'Dados que viram decisão.', en: 'Data that becomes decisions.' } as T,
+  short: {
+    pt: 'Ciência de Dados · Instituto Conhecimento Liberta',
+    en: 'Data Science · Instituto Conhecimento Liberta',
+  } as T,
   intro: {
     pt: 'Estudante de Ciência de Dados e assistente de dados no Instituto Conhecimento Liberta. Aqui eu publico o que estou construindo e aprendendo.',
     en: 'Data Science student and data assistant at Instituto Conhecimento Liberta. This is where I share what I build and learn.',
@@ -93,6 +97,8 @@ export const ui = {
   formEmail: { pt: 'E-mail', en: 'Email' },
   formMessage: { pt: 'Mensagem', en: 'Message' },
   formSend: { pt: 'Enviar mensagem', en: 'Send message' },
+  writeMe: { pt: 'Escrever mensagem', en: 'Write a message' },
+  kineticTop: { pt: 'Ciência de Dados', en: 'Data Science' },
   formSending: { pt: 'Enviando…', en: 'Sending…' },
   formOk: { pt: 'Mensagem enviada. Obrigado! Respondo em breve.', en: 'Message sent. Thank you! I will reply soon.' },
   formFail: { pt: 'Não foi possível enviar agora. Tente o e-mail acima.', en: "Couldn't send right now. Try the email above." },
