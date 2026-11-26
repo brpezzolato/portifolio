@@ -63,6 +63,15 @@ export const site = {
       kind: { pt: 'Formação', en: 'Education' },
       text: { pt: 'Estatística, programação e aprendizado de máquina.', en: 'Statistics, programming and machine learning.' },
     },
+    {
+      title: { pt: 'Técnico em Desenvolvimento de Sistemas', en: 'Technical Degree in Systems Development' },
+      org: 'SENAI São Caetano do Sul · Mecatrônica Boa Vista',
+      kind: { pt: 'Formação · 2024–2025', en: 'Education · 2024–2025' },
+      text: {
+        pt: 'Curso técnico de dois anos: lógica de programação, desenvolvimento web, banco de dados e projetos práticos.',
+        en: 'Two-year technical program: programming logic, web development, databases and hands-on projects.',
+      },
+    },
   ] as { title: T; org: string | T; kind: T; text: T }[],
 
   /* Fotos de apresentações (Galeria). Fica escondida enquanto vazia.
