@@ -124,7 +124,7 @@ export async function deleteMessage(form: FormData) {
 /* ---------- conteúdo do site ---------- */
 const t = z.object({ pt: z.string().trim().max(1200), en: z.string().trim().max(1200) });
 const settingsSchema = z.object({
-  email: z.union([z.literal(''), z.email().max(254)]),
+  email: z.union([z.literal(''), z.email('E-mail inválido. Confira o endereço.').max(254)]),
   github: httpsUrl,
   linkedin: httpsUrl,
   status: t,

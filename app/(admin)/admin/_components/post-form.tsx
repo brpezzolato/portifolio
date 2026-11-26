@@ -1,11 +1,12 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { savePost, type FormState } from '../_actions/content';
+import { savePost } from '../_actions/content';
 import { Area, Choice, Field, MarkdownField, SlugField, Status, Toggle, slugify } from './fields';
 import { Panel } from './ui';
+import { useSave } from './use-save';
 
 export type PostRow = {
   id: string; slug: string; title: string; excerpt: string; body: string; kind: string;
@@ -19,13 +20,13 @@ const ddmmyyyy = (iso?: string) => {
 
 /* Editor de novidade: conteúdo à esquerda, publicação fixa à direita. */
 export function PostForm({ p, projects }: { p?: PostRow; projects: { slug: string; title: string }[] }) {
-  const [state, action, pending] = useActionState<FormState, FormData>(savePost, null);
+  const { state, pending, dirty, form } = useSave(savePost);
   const [title, setTitle] = useState(p?.title ?? '');
   const [slug, setSlug] = useState(p?.slug ?? '');
   const [slugTouched, setSlugTouched] = useState(Boolean(p));
 
   return (
-    <form action={action} className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_19rem]">
+    <form {...form} className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_19rem]">
       {p && <input type="hidden" name="id" value={p.id} />}
 
       <div className="min-w-0 space-y-6">
@@ -92,7 +93,13 @@ export function PostForm({ p, projects }: { p?: PostRow; projects: { slug: strin
             {pending ? 'Salvando…' : p ? 'Salvar alterações' : 'Criar novidade'}
           </Button>
           <div className="mt-3 min-h-5 text-center">
-            <Status state={state} />
+            {state?.error || !dirty ? (
+              <Status state={state} />
+            ) : (
+              <p className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+                <span className="size-1.5 rounded-full bg-amber-500" /> Alterações não salvas
+              </p>
+            )}
           </div>
           {p?.published && (
             <a

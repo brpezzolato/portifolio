@@ -1,6 +1,5 @@
 'use client';
 
-import { useActionState } from 'react';
 import { Briefcase, Link2, Sparkles, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,8 +7,10 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import type { SiteData } from '@/lib/settings';
-import { saveSettings, type FormState } from '../_actions/content';
-import { Field, Status } from './fields';
+import { saveSettings } from '../_actions/content';
+import { Field } from './fields';
+import { SaveBar } from './save-bar';
+import { useSave } from './use-save';
 import { Panel } from './ui';
 
 type T = { pt: string; en: string };
@@ -73,12 +74,12 @@ const tabs = [
 ] as const;
 
 export function SettingsForm({ s }: { s: SiteData }) {
-  const [state, action, pending] = useActionState<FormState, FormData>(saveSettings, null);
+  const save = useSave(saveSettings);
   const link = (label: string) => s.links.find((l) => l.label === label)?.href ?? '';
   const orgT = (o: string | T): T => (typeof o === 'string' ? { pt: o, en: o } : o);
 
   return (
-    <form action={action}>
+    <form {...save.form}>
       <Tabs defaultValue="contato" className="gap-6">
         <TabsList variant="line" className="h-auto! w-full justify-start gap-1 overflow-x-auto border-b border-border pb-0">
           {tabs.map((t) => (
@@ -149,14 +150,7 @@ export function SettingsForm({ s }: { s: SiteData }) {
         </TabsContent>
       </Tabs>
 
-      <div className="sticky bottom-4 z-10 mt-8 flex items-center gap-4 rounded-full border border-border bg-background/90 p-2 pl-6 shadow-[0_10px_40px_-15px_rgb(0_0_0/0.3)] backdrop-blur">
-        <div className="min-w-0 flex-1">
-          {state ? <Status state={state} /> : <p className="text-sm text-muted-foreground">As alterações vão ao ar assim que você salvar.</p>}
-        </div>
-        <Button type="submit" size="pill" className="h-11 shrink-0 px-6" disabled={pending}>
-          {pending ? 'Salvando…' : 'Salvar conteúdo'}
-        </Button>
-      </div>
+      <SaveBar {...save} label="Salvar conteúdo" />
     </form>
   );
 }

@@ -1,11 +1,12 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { saveProject, type FormState } from '../_actions/content';
+import { saveProject } from '../_actions/content';
 import { Area, Choice, Field, MarkdownField, SlugField, Status, Toggle, slugify } from './fields';
 import { Panel } from './ui';
+import { useSave } from './use-save';
 
 export type ProjectRow = {
   id: string; slug: string; title: string; summary: string; body: string; year: number;
@@ -14,13 +15,13 @@ export type ProjectRow = {
 
 /* Editor de projeto: conteúdo à esquerda, publicação fixa à direita. */
 export function ProjectForm({ p }: { p?: ProjectRow }) {
-  const [state, action, pending] = useActionState<FormState, FormData>(saveProject, null);
+  const { state, pending, dirty, form } = useSave(saveProject);
   const [title, setTitle] = useState(p?.title ?? '');
   const [slug, setSlug] = useState(p?.slug ?? '');
   const [slugTouched, setSlugTouched] = useState(Boolean(p));
 
   return (
-    <form action={action} className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_19rem]">
+    <form {...form} className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_19rem]">
       {p && <input type="hidden" name="id" value={p.id} />}
 
       <div className="min-w-0 space-y-6">
@@ -84,7 +85,13 @@ export function ProjectForm({ p }: { p?: ProjectRow }) {
             {pending ? 'Salvando…' : p ? 'Salvar alterações' : 'Criar projeto'}
           </Button>
           <div className="mt-3 min-h-5 text-center">
-            <Status state={state} />
+            {state?.error || !dirty ? (
+              <Status state={state} />
+            ) : (
+              <p className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+                <span className="size-1.5 rounded-full bg-amber-500" /> Alterações não salvas
+              </p>
+            )}
           </div>
           {p?.published && (
             <a
