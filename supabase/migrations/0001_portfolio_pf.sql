@@ -1,5 +1,5 @@
--- Portfólio do Bruno. Roda dentro do projeto Supabase "Synapse", por isso
--- tudo tem prefixo pf_ (não toca em nenhuma tabela/função do Synapse).
+-- Portfólio do Bruno, no projeto Supabase próprio "portfólio".
+-- (O prefixo pf_ ficou de quando o banco dividia projeto com outro app.)
 -- Aplicado em 2026-11-26 como migration "portfolio_pf_init".
 
 create table public.pf_admins (

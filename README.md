@@ -44,12 +44,11 @@ mensagens do formulário de contato.
 
 ### Onde está o banco
 
-O banco roda no projeto Supabase **Synapse** (o plano gratuito permite só dois
-projetos). Por isso todas as tabelas e funções do portfólio têm prefixo `pf_`
-(`supabase/migrations/0001_portfolio_pf.sql`) e nada do Synapse é tocado.
-As configurações de autenticação do projeto também não foram mudadas (o Synapse
-precisa delas): o painel exige estar em `pf_admins`, estar em `ADMIN_EMAILS` e
-ter o código do autenticador.
+Projeto Supabase próprio, **portfólio**, só para este site. As tabelas e funções
+têm prefixo `pf_` (de quando o banco dividia projeto com outro app) e ficam em
+`supabase/migrations/`. O primeiro admin entra sozinho: quando o e-mail guardado
+em `pf_config.admin_email` é criado e confirmado no Supabase, ele vai para
+`pf_admins` (`0003_pf_admin_bootstrap.sql`).
 
 Variáveis na Vercel: `NEXT_PUBLIC_SUPABASE_URL`,
 `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `ADMIN_EMAILS`, `ADMIN_PATH` e
