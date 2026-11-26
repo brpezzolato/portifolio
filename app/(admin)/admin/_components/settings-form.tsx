@@ -183,7 +183,7 @@ function JourneyEditor({ initial, onChange }: { initial: Step[]; onChange: () =>
   };
 
   return (
-    <Panel title="Etapas" description="Trabalho e formação, na ordem em que aparecem no site. Adicione quantas quiser.">
+    <Panel title="Etapas" description="Trabalho e formação, na ordem em que aparecem no site. Adicione quantas quiser; para tirar uma, use "Excluir etapa" e depois salve.">
       <div ref={listRef} className="space-y-4">
         {steps.length === 0 && (
           <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">Nenhuma etapa ainda.</p>
@@ -198,8 +198,12 @@ function JourneyEditor({ initial, onChange }: { initial: Step[]; onChange: () =>
               <button type="button" aria-label="Descer etapa" disabled={i === steps.length - 1} onClick={() => move(i, 1)} className="grid size-8 place-items-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-30 disabled:hover:bg-transparent">
                 <ArrowDown className="size-4" />
               </button>
-              <button type="button" aria-label="Remover etapa" onClick={() => remove(i)} className="grid size-8 place-items-center rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
-                <Trash2 className="size-4" />
+              <button
+                type="button"
+                onClick={() => remove(i)}
+                className="ml-1 inline-flex h-8 items-center gap-1.5 rounded-full bg-destructive/10 px-3 text-xs font-medium text-destructive transition-colors hover:bg-destructive/20"
+              >
+                <Trash2 className="size-3.5" /> Excluir etapa
               </button>
             </div>
             <div className="space-y-4 pt-8 sm:pt-6">
