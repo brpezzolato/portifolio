@@ -39,5 +39,5 @@ export function useSave(fn: (prev: State, form: FormData) => Promise<State>) {
     },
   };
 
-  return { state, pending, dirty, savedAt, form };
+  return { state, pending, dirty, savedAt, form, touch };
 }

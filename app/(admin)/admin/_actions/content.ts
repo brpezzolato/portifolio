@@ -136,7 +136,7 @@ const settingsSchema = z.object({
   stack: z.string().max(600),
   chips: z.array(t).max(6),
   skills: z.array(z.object({ title: t, detail: t })).max(8),
-  journey: z.array(z.object({ title: t, org: t, kind: t, text: t })).max(8),
+  journey: z.array(z.object({ title: t, org: t, kind: t, text: t })).max(60),
 });
 
 /* Monta objeto aninhado a partir de nomes como "skills.0.title.pt". */

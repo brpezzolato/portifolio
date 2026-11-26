@@ -1,6 +1,7 @@
 'use client';
 
-import { Briefcase, Link2, Sparkles, UserRound } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { ArrowDown, ArrowUp, Briefcase, Link2, Plus, Sparkles, Trash2, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -137,20 +138,86 @@ export function SettingsForm({ s }: { s: SiteData }) {
         </TabsContent>
 
         <TabsContent value="jornada" keepMounted className="space-y-6">
-          <Panel title="Etapas" description="Trabalho e formação, na ordem em que aparecem. Deixe o título vazio para remover.">
-            {pad(s.journey, 5, { title: empty, org: empty, kind: empty, text: empty }).map((j, i) => (
-              <Item key={i} n={i + 1}>
-                <Bi label="Cargo ou curso" name={`journey.${i}.title`} value={j.title} />
-                <Bi label="Instituição" name={`journey.${i}.org`} value={orgT(j.org)} />
-                <Bi label="Tipo" name={`journey.${i}.kind`} value={j.kind} hint="Ex.: Trabalho, Formação, Projeto." />
-                <Bi label="Descrição" name={`journey.${i}.text`} value={j.text} long />
-              </Item>
-            ))}
-          </Panel>
+          <JourneyEditor initial={s.journey.map((j) => ({ ...j, org: orgT(j.org) }))} onChange={save.touch} />
         </TabsContent>
       </Tabs>
 
       <SaveBar {...save} label="Salvar conteúdo" />
     </form>
+  );
+}
+
+type Step = { title: T; org: T; kind: T; text: T };
+
+/* Etapas da jornada: só as preenchidas, botão para adicionar quantas quiser,
+   e cada uma pode subir, descer ou ser removida. A chave fixa de cada etapa
+   mantém o que foi digitado quando a ordem muda. */
+function JourneyEditor({ initial, onChange }: { initial: Step[]; onChange: () => void }) {
+  const seq = useRef(0);
+  const make = (st: Step) => ({ key: `e${seq.current++}`, ...st });
+  const [steps, setSteps] = useState(() => initial.map(make));
+  const listRef = useRef<HTMLDivElement>(null);
+
+  const move = (i: number, d: -1 | 1) => {
+    setSteps((arr) => {
+      const next = [...arr];
+      [next[i], next[i + d]] = [next[i + d], next[i]];
+      return next;
+    });
+    onChange();
+  };
+  const remove = (i: number) => {
+    setSteps((arr) => arr.filter((_, k) => k !== i));
+    onChange();
+  };
+  const add = () => {
+    setSteps((arr) => [...arr, make({ title: empty, org: empty, kind: empty, text: empty })]);
+    onChange();
+    // leva até a nova etapa e foca o primeiro campo
+    requestAnimationFrame(() => {
+      const items = listRef.current?.querySelectorAll('[data-step]');
+      const last = items?.[items.length - 1] as HTMLElement | undefined;
+      last?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      last?.querySelector('input')?.focus({ preventScroll: true });
+    });
+  };
+
+  return (
+    <Panel title="Etapas" description="Trabalho e formação, na ordem em que aparecem no site. Adicione quantas quiser.">
+      <div ref={listRef} className="space-y-4">
+        {steps.length === 0 && (
+          <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">Nenhuma etapa ainda.</p>
+        )}
+        {steps.map((j, i) => (
+          <div key={j.key} data-step className="relative rounded-2xl border border-border bg-background p-5 pl-14">
+            <span className="absolute top-5 left-5 grid size-6 place-items-center rounded-full bg-muted font-mono text-xs text-muted-foreground">{i + 1}</span>
+            <div className="absolute top-3.5 right-3.5 flex items-center gap-0.5">
+              <button type="button" aria-label="Subir etapa" disabled={i === 0} onClick={() => move(i, -1)} className="grid size-8 place-items-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-30 disabled:hover:bg-transparent">
+                <ArrowUp className="size-4" />
+              </button>
+              <button type="button" aria-label="Descer etapa" disabled={i === steps.length - 1} onClick={() => move(i, 1)} className="grid size-8 place-items-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-30 disabled:hover:bg-transparent">
+                <ArrowDown className="size-4" />
+              </button>
+              <button type="button" aria-label="Remover etapa" onClick={() => remove(i)} className="grid size-8 place-items-center rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
+                <Trash2 className="size-4" />
+              </button>
+            </div>
+            <div className="space-y-4 pt-8 sm:pt-6">
+              <Bi label="Cargo ou curso" name={`journey.${i}.title`} value={j.title} />
+              <Bi label="Instituição" name={`journey.${i}.org`} value={j.org} />
+              <Bi label="Tipo e período" name={`journey.${i}.kind`} value={j.kind} hint="Ex.: Trabalho · 2025–atual, Formação · 2024–2025." />
+              <Bi label="Descrição" name={`journey.${i}.text`} value={j.text} long />
+            </div>
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={add}
+        className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border py-4 text-sm font-medium text-muted-foreground transition-colors hover:border-signal/50 hover:bg-signal/5 hover:text-foreground"
+      >
+        <Plus className="size-4" /> Adicionar etapa
+      </button>
+    </Panel>
   );
 }
