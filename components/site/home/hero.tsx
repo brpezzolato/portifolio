@@ -5,7 +5,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { HeroScene } from '@/components/site/hero-scene';
 import { useLang } from '@/components/site/providers';
 import { TypeLines } from '@/components/site/type-lines';
-import { site } from '@/lib/site';
+import { useSite } from '@/components/site/site-data';
 
 /* Herói com a orbe no centro e o nome separado nos cantos ("Bruno" no alto
    à esquerda, "Pezzolato" embaixo à direita). Ao rolar, a cena fica presa
@@ -47,6 +47,7 @@ function Word({ children, progress, delta, className, innerRef }: {
 }
 
 export function Hero() {
+  const site = useSite();
   const { t } = useLang();
   const reduce = useReducedMotion();
   const [first, ...rest] = site.name.split(' ');

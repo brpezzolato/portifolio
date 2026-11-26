@@ -1,9 +1,11 @@
 'use client';
 
-import { site, ui } from '@/lib/site';
+import { ui } from '@/lib/site';
+import { useSite } from '@/components/site/site-data';
 import { useLang } from './providers';
 
 export function SiteFooter() {
+  const site = useSite();
   const { t } = useLang();
   return (
     <footer className="mx-auto max-w-[1280px] px-5 pb-10 sm:px-8">

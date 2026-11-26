@@ -9,7 +9,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { sendContact, type ContactState } from '@/app/actions/contact';
 import { useLang } from '@/components/site/providers';
 import { Reveal } from '@/components/site/reveal';
-import { site, ui } from '@/lib/site';
+import { ui } from '@/lib/site';
+import { useSite } from '@/components/site/site-data';
 import { wrap } from './shared';
 
 /* Contato em três partes alinhadas à mesma grade:
@@ -31,6 +32,7 @@ const noAutofill = {
 const field = 'h-12 rounded-xl bg-background px-4 text-base md:text-base';
 
 export function Contact() {
+  const site = useSite();
   const { t } = useLang();
   const [state, action, pending] = useActionState<ContactState, FormData>(sendContact, { status: 'idle' });
   const msg = { ok: ui.formOk, invalid: ui.formInvalid, fail: ui.formFail }[state.status as 'ok' | 'invalid' | 'fail'];

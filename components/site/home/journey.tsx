@@ -4,7 +4,8 @@ import { motion, useScroll, useTransform } from 'motion/react';
 import { useRef } from 'react';
 import { useLang } from '@/components/site/providers';
 import { Reveal } from '@/components/site/reveal';
-import { site, ui } from '@/lib/site';
+import { ui } from '@/lib/site';
+import { useSite } from '@/components/site/site-data';
 import { wrap } from './shared';
 
 /* Jornada como capítulos: um trilho horizontal no alto se preenche com a
@@ -12,6 +13,7 @@ import { wrap } from './shared';
    cartão com número grande vazado, tipo, título, instituição e descrição.
    No celular, o trilho vira vertical à esquerda. */
 export function Journey() {
+  const site = useSite();
   const { t } = useLang();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.85', 'end 0.55'] });

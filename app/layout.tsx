@@ -4,11 +4,7 @@ import { headers } from 'next/headers';
 import { Providers } from '@/components/site/providers';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
-import { SiteHeader } from '@/components/site/site-header';
-import { SiteFooter } from '@/components/site/site-footer';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { Preloader } from '@/components/site/preloader';
-import { SmoothScroll } from '@/components/site/smooth-scroll';
 import { site } from '@/lib/site';
 import './globals.css';
 
@@ -46,14 +42,8 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
       >
         <div aria-hidden className="site-backdrop" />
         <div aria-hidden className="site-grain" />
-        <Preloader />
-        <SmoothScroll />
         <Providers nonce={nonce}>
-        <TooltipProvider>
-          <SiteHeader />
-          <main>{children}</main>
-          <SiteFooter />
-        </TooltipProvider>
+          <TooltipProvider>{children}</TooltipProvider>
         </Providers>
       </body>
     </html>

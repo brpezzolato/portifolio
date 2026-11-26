@@ -21,6 +21,39 @@ npm run dev
 
 Sem `.env.local` o site funciona com o conteúdo de exemplo de `lib/seed.ts`.
 
+## Painel administrativo (rota escondida)
+
+Tudo o que aparece no site é editado pelo painel: conteúdo (textos PT/EN, links,
+cartões, jornada, etiquetas), projetos, novidades (com rascunho e data) e as
+mensagens do formulário de contato.
+
+- **Endereço secreto:** o painel abre só em `/<ADMIN_PATH>`. `/admin` e qualquer
+  outro caminho respondem 404. Sem `ADMIN_PATH`, o painel fica desligado.
+- **Entrada em duas etapas, obrigatória:** senha (12+ caracteres) e código de app
+  autenticador (TOTP). No primeiro acesso o painel mostra o QR code para cadastrar.
+- **Limite de tentativas:** 5 por endereço a cada 15 minutos (login e código).
+- **Banco:** RLS em todas as tabelas; escrita só para quem está na tabela `admins`
+  **e** com sessão de dois fatores (`aal2`). A `service_role` não é usada.
+- **Sem rastro:** painel com `no-store`, `noindex` e `no-referrer`; cookies `SameSite=Strict`.
+
+### Configurar (uma vez)
+
+1. Crie um projeto no Supabase e rode, no SQL Editor, os arquivos de
+   `supabase/migrations/` em ordem (0001, 0002, 0003).
+2. Supabase → Authentication:
+   - **Sign In / Providers → Email:** desligue *Allow new users to sign up*.
+   - **Users → Add user:** crie seu usuário com senha forte (12+).
+   - **Multi-Factor:** deixe TOTP habilitado (padrão).
+   - **Passwords:** ative *leaked password protection* e mínimo de 12.
+3. No SQL Editor: `insert into public.admins (user_id) values ('<id do seu usuário>');`
+4. Variáveis na Vercel (Settings → Environment Variables):
+   - `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+   - `ADMIN_EMAILS` = seu e-mail
+   - `ADMIN_PATH` = um caminho aleatório longo (16–64 letras minúsculas, números
+     e hífens), ex.: gere com `openssl rand -hex 16`. **Não conte para ninguém.**
+5. Refaça o deploy, abra `https://seu-site/<ADMIN_PATH>`, entre e cadastre o
+   autenticador.
+
 ## Segurança (três barreiras, nenhuma confia na anterior)
 
 1. **`proxy.ts`** — CSP com nonce novo a cada pedido; `/admin` responde **404**

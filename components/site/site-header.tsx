@@ -6,7 +6,8 @@ import { motion } from 'motion/react';
 import { useTheme } from 'next-themes';
 import { Menu, Moon, Sun } from 'lucide-react';
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { nav, site, ui } from '@/lib/site';
+import { nav, ui } from '@/lib/site';
+import { useSite } from '@/components/site/site-data';
 import { cn } from 'cn';
 import { useLang } from './providers';
 
@@ -15,6 +16,7 @@ import { useLang } from './providers';
    links das seções com uma "gota" que segue o mouse, idioma e tema. Ao rolar,
    a pílula encolhe um pouco. No celular, os links vão para uma gaveta. */
 export function SiteHeader() {
+  const site = useSite();
   const { t, lang, setLang } = useLang();
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);

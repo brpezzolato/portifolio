@@ -2,12 +2,14 @@
 
 import { useLang } from '@/components/site/providers';
 import { Reveal } from '@/components/site/reveal';
-import { site, ui } from '@/lib/site';
+import { ui } from '@/lib/site';
+import { useSite } from '@/components/site/site-data';
 import { SectionTitle, wrap } from './shared';
 
 /* Galeria de fotos (apresentações, eventos). Só aparece quando houver fotos
    em site.gallery. */
 export function Gallery() {
+  const site = useSite();
   const { t } = useLang();
   if (site.gallery.length === 0) return null;
   return (

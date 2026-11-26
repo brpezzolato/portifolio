@@ -5,7 +5,8 @@ import { BrainCircuit, Briefcase, Code2, GraduationCap } from 'lucide-react';
 import { useLang } from '@/components/site/providers';
 import { Reveal } from '@/components/site/reveal';
 import { ScrollWords } from '@/components/site/scroll-words';
-import { site, ui } from '@/lib/site';
+import { ui } from '@/lib/site';
+import { useSite } from '@/components/site/site-data';
 import { CountUp, wrap } from './shared';
 
 const icons = [GraduationCap, Briefcase, Code2, BrainCircuit];
@@ -14,6 +15,7 @@ const icons = [GraduationCap, Briefcase, Code2, BrainCircuit];
    na tela e se preenche palavra por palavra; à direita, os cartões sobem
    contando o resto (formação, trabalho, produto, IA, números e o agora). */
 export function About({ stats }: { stats: { projects: number; news: number } }) {
+  const site = useSite();
   const { t } = useLang();
   const section = useRef<HTMLElement>(null);
 

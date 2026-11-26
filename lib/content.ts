@@ -52,6 +52,7 @@ export async function getProjects(): Promise<Project[]> {
   const { data, error } = await db
     .from('projects')
     .select(PROJECT_COLUMNS)
+    .eq('published', true)
     .order('year', { ascending: false })
     .returns<ProjectRow[]>();
   if (error) throw new Error('Não foi possível carregar os projetos.');
@@ -74,6 +75,8 @@ export async function getPosts(limit?: number): Promise<Post[]> {
   let query = db
     .from('posts')
     .select(POST_COLUMNS)
+    .eq('published', true)
+    .lte('published_at', new Date().toISOString())
     .order('published_at', { ascending: false });
   if (limit) query = query.limit(limit);
   const { data, error } = await query.returns<PostRow[]>();
