@@ -116,6 +116,7 @@ export const ui = {
   formSending: { pt: 'Enviando…', en: 'Sending…' },
   formOk: { pt: 'Mensagem enviada. Obrigado! Respondo em breve.', en: 'Message sent. Thank you! I will reply soon.' },
   formFail: { pt: 'Não foi possível enviar agora. Tente o e-mail acima.', en: "Couldn't send right now. Try the email above." },
+  formLimit: { pt: 'Muitas mensagens em pouco tempo. Tente de novo mais tarde ou use o e-mail acima.', en: 'Too many messages in a short time. Try again later or use the email above.' },
   formInvalid: { pt: 'Confira os campos: nome, e-mail válido e uma mensagem de pelo menos 10 caracteres.', en: 'Check the fields: name, a valid email and a message of at least 10 characters.' },
   rights: { pt: 'Feito com Next.js, Supabase e three.js.', en: 'Built with Next.js, Supabase and three.js.' },
   theme: { pt: 'Alternar tema', en: 'Toggle theme' },

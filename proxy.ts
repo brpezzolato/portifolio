@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { contentSecurityPolicy, createNonce } from '@/lib/csp';
-import { supabaseConfigured, supabaseKey, supabaseUrl } from '@/lib/supabase/env';
+import { secureCookie, supabaseConfigured, supabaseKey, supabaseUrl } from '@/lib/supabase/env';
 
 /* Toda requisição passa aqui:
    1. CSP com nonce novo (só roda script carimbado pelo Next).
@@ -24,7 +24,6 @@ function hidden(request: NextRequest, csp: string) {
 
 export async function proxy(request: NextRequest) {
   const csp = contentSecurityPolicy(createNonce(), {
-    supabaseUrl,
     dev: process.env.NODE_ENV === 'development',
   });
   request.headers.set('Content-Security-Policy', csp);
@@ -54,7 +53,7 @@ export async function proxy(request: NextRequest) {
           cookies.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.rewrite(target, { request });
           cookies.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, { ...options, sameSite: 'strict', secure: process.env.NODE_ENV !== 'development' }),
+            response.cookies.set(name, value, { ...options, ...secureCookie }),
           );
         },
       },

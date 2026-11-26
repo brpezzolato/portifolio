@@ -12,16 +12,9 @@ export function createNonce() {
   return btoa(String.fromCharCode(...bytes));
 }
 
-export function contentSecurityPolicy(
-  nonce: string,
-  { supabaseUrl, dev }: { supabaseUrl?: string; dev: boolean },
-) {
-  // O navegador fala direto com o Supabase (login do painel).
-  const supabase = supabaseUrl ? new URL(supabaseUrl) : null;
-  const connect = [
-    "'self'",
-    ...(supabase ? [supabase.origin, `wss://${supabase.host}`] : []),
-  ];
+export function contentSecurityPolicy(nonce: string, { dev }: { dev: boolean }) {
+  // Tudo passa pelo servidor do site: o navegador não fala com o Supabase.
+  const connect = ["'self'"];
   return [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${dev ? " 'unsafe-eval'" : ''}`,

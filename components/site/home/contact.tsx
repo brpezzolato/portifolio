@@ -35,7 +35,7 @@ export function Contact() {
   const site = useSite();
   const { t } = useLang();
   const [state, action, pending] = useActionState<ContactState, FormData>(sendContact, { status: 'idle' });
-  const msg = { ok: ui.formOk, invalid: ui.formInvalid, fail: ui.formFail }[state.status as 'ok' | 'invalid' | 'fail'];
+  const msg = { ok: ui.formOk, invalid: ui.formInvalid, fail: ui.formFail, limit: ui.formLimit }[state.status as 'ok' | 'invalid' | 'fail' | 'limit'];
 
   const channels = [
     { icon: Mail, label: ui.formEmail, value: site.email, href: `mailto:${site.email}`, external: false },

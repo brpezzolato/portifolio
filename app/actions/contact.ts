@@ -1,10 +1,11 @@
 'use server';
 
 import { z } from 'zod';
+import { attemptKey, serverSecret } from '@/lib/server-secret';
 import { supabaseConfigured } from '@/lib/supabase/env';
 import { createClient } from '@/lib/supabase/server';
 
-export type ContactState = { status: 'idle' | 'ok' | 'invalid' | 'fail' };
+export type ContactState = { status: 'idle' | 'ok' | 'invalid' | 'fail' | 'limit' };
 
 const schema = z.object({
   name: z.string().trim().min(2).max(80),
@@ -13,8 +14,9 @@ const schema = z.object({
   website: z.string().max(0), // armadilha: humanos não veem este campo
 });
 
-/* Grava a mensagem no Supabase. O público só pode INSERIR na tabela
-   (supabase/migrations/0002), nunca ler: quem lê é você, pelo painel. */
+/* Envia pela função pf_send_contact, que só aceita chamadas com o segredo do
+   servidor e limita a 3 mensagens por visitante a cada 15 min (e 30 por hora
+   no total). O público não consegue inserir direto na tabela nem ler nada. */
 export async function sendContact(_: ContactState, form: FormData): Promise<ContactState> {
   const parsed = schema.safeParse({
     // nomes neutros nos campos (c1/c2/c3) para o navegador não reconhecer
@@ -29,10 +31,16 @@ export async function sendContact(_: ContactState, form: FormData): Promise<Cont
     if (form.get('website')) return { status: 'ok' };
     return { status: 'invalid' };
   }
-  if (!supabaseConfigured) return { status: 'fail' };
+  const secret = serverSecret();
+  if (!supabaseConfigured || !secret) return { status: 'fail' };
   const db = await createClient();
-  const { website: _hp, ...row } = parsed.data;
-  void _hp;
-  const { error } = await db.from('pf_contact_messages').insert(row);
-  return { status: error ? 'fail' : 'ok' };
+  const { data, error } = await db.rpc('pf_send_contact', {
+    p_secret: secret,
+    p_key: await attemptKey('contact'),
+    p_name: parsed.data.name,
+    p_email: parsed.data.email,
+    p_message: parsed.data.message,
+  });
+  if (error) return { status: 'fail' };
+  return { status: data === 'ok' ? 'ok' : data === 'limit' ? 'limit' : 'fail' };
 }

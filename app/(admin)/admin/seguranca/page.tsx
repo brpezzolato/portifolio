@@ -14,6 +14,8 @@ export default async function AdminSecurity() {
     ['Dois fatores', factors.length ? `Ativo desde ${formatDate(factors[0].created_at)}` : 'Não configurado'],
     ['Banco de dados', 'RLS em todas as tabelas; escrita só com sessão de dois fatores.'],
     ['Tentativas de login', 'Máximo de 5 a cada 15 minutos por endereço.'],
+    ['Formulário de contato', '3 mensagens por visitante a cada 15 min; 30 por hora no total.'],
+    ['Sessão', 'Cookie httpOnly, só HTTPS e SameSite=strict.'],
   ];
   return (
     <div className="max-w-2xl">

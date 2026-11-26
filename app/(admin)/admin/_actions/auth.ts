@@ -1,25 +1,20 @@
 'use server';
 
-import { createHash } from 'node:crypto';
-import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { adminBase, isAdminEmail } from '@/lib/admin';
+import { attemptKey, serverSecret } from '@/lib/server-secret';
 import { supabaseConfigured } from '@/lib/supabase/env';
 import { createClient } from '@/lib/supabase/server';
 
 const GENERIC = 'Não foi possível entrar.';
 
-/* Chave do limitador: hash do IP + segredo da rota (nunca o IP em claro). */
-async function attemptKey(scope: string) {
-  const h = await headers();
-  const ip = (h.get('x-forwarded-for') ?? '').split(',')[0].trim() || h.get('x-real-ip') || 'desconhecido';
-  return createHash('sha256').update(`${scope}|${ip}|${process.env.ADMIN_PATH ?? ''}`).digest('hex');
-}
-
+/* Sem o segredo do servidor, ou se o banco falhar, nega (falha fechada). */
 async function allowAttempt(scope: string) {
+  const secret = serverSecret();
+  if (!secret) return false;
   const db = await createClient();
-  const { data, error } = await db.rpc('pf_register_login_attempt', { p_key: await attemptKey(scope) });
+  const { data, error } = await db.rpc('pf_register_login_attempt', { p_secret: secret, p_key: await attemptKey(scope) });
   return !error && data === true;
 }
 

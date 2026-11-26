@@ -34,7 +34,13 @@ mensagens do formulário de contato.
 - **Limite de tentativas:** 5 por endereço a cada 15 minutos (login e código).
 - **Banco:** RLS em todas as tabelas; escrita só para quem está na tabela `admins`
   **e** com sessão de dois fatores (`aal2`). A `service_role` não é usada.
-- **Sem rastro:** painel com `no-store`, `noindex` e `no-referrer`; cookies `SameSite=Strict`.
+- **Sem rastro:** painel com `no-store`, `noindex` e `no-referrer`; cookie de sessão
+  `httpOnly`, só HTTPS e `SameSite=Strict`. O navegador nunca fala com o Supabase.
+- **Funções públicas trancadas:** o limite de tentativas e o envio do contato só
+  aceitam chamadas com `PF_SERVER_SECRET` (o banco guarda só o SHA-256, em
+  `pf_config`). Ninguém usa essas funções direto pela API do Supabase.
+- **Contato com limite:** 3 mensagens por visitante a cada 15 min e 30 por hora no
+  total; o público não insere nem lê a tabela diretamente.
 
 ### Onde está o banco
 
@@ -46,8 +52,10 @@ precisa delas): o painel exige estar em `pf_admins`, estar em `ADMIN_EMAILS` e
 ter o código do autenticador.
 
 Variáveis na Vercel: `NEXT_PUBLIC_SUPABASE_URL`,
-`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `ADMIN_EMAILS` e `ADMIN_PATH`.
-Para trocar o endereço secreto, mude `ADMIN_PATH` na Vercel e refaça o deploy.
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `ADMIN_EMAILS`, `ADMIN_PATH` e
+`PF_SERVER_SECRET`. Para trocar o endereço secreto, mude `ADMIN_PATH` na Vercel e
+refaça o deploy. Para trocar o segredo do servidor, veja o topo de
+`supabase/migrations/0002_pf_hardening.sql`.
 
 ## Segurança (três barreiras, nenhuma confia na anterior)
 
