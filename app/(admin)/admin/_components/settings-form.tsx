@@ -183,7 +183,7 @@ function JourneyEditor({ initial, onChange }: { initial: Step[]; onChange: () =>
   };
 
   return (
-    <Panel title="Etapas" description="Trabalho e formação, na ordem em que aparecem no site. Adicione quantas quiser; para tirar uma, use "Excluir etapa" e depois salve.">
+    <Panel title="Etapas" description="Trabalho e formação, na ordem em que aparecem no site. Adicione quantas quiser; para tirar uma, use “Excluir etapa” e depois salve.">
       <div ref={listRef} className="space-y-4">
         {steps.length === 0 && (
           <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">Nenhuma etapa ainda.</p>
