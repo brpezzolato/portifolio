@@ -52,7 +52,7 @@ export async function saveProject(_: FormState, form: FormData): Promise<FormSta
     published: bool(form.get('published')),
   });
   if (!parsed.success) return { error: message(parsed.error) };
-  const q = id ? db.from('projects').update(parsed.data).eq('id', id) : db.from('projects').insert(parsed.data);
+  const q = id ? db.from('pf_projects').update(parsed.data).eq('id', id) : db.from('pf_projects').insert(parsed.data);
   const { error } = await q;
   if (error) return { error: error.code === '23505' ? 'Já existe um projeto com esse slug.' : 'Não foi possível salvar.' };
   go('/projetos');
@@ -62,7 +62,7 @@ export async function saveProject(_: FormState, form: FormData): Promise<FormSta
 export async function deleteProject(form: FormData) {
   const { db } = await requireAdmin();
   const id = z.uuid().safeParse(form.get('id'));
-  if (id.success) await db.from('projects').delete().eq('id', id.data);
+  if (id.success) await db.from('pf_projects').delete().eq('id', id.data);
   go('/projetos');
 }
 
@@ -99,7 +99,7 @@ export async function savePost(_: FormState, form: FormData): Promise<FormState>
     published_at: form.get('published_at'),
   });
   if (!parsed.success) return { error: message(parsed.error) };
-  const q = id ? db.from('posts').update(parsed.data).eq('id', id) : db.from('posts').insert(parsed.data);
+  const q = id ? db.from('pf_posts').update(parsed.data).eq('id', id) : db.from('pf_posts').insert(parsed.data);
   const { error } = await q;
   if (error) return { error: error.code === '23505' ? 'Já existe uma novidade com esse slug.' : 'Não foi possível salvar.' };
   go('/novidades');
@@ -109,7 +109,7 @@ export async function savePost(_: FormState, form: FormData): Promise<FormState>
 export async function deletePost(form: FormData) {
   const { db } = await requireAdmin();
   const id = z.uuid().safeParse(form.get('id'));
-  if (id.success) await db.from('posts').delete().eq('id', id.data);
+  if (id.success) await db.from('pf_posts').delete().eq('id', id.data);
   go('/novidades');
 }
 
@@ -117,7 +117,7 @@ export async function deletePost(form: FormData) {
 export async function deleteMessage(form: FormData) {
   const { db } = await requireAdmin();
   const id = z.uuid().safeParse(form.get('id'));
-  if (id.success) await db.from('contact_messages').delete().eq('id', id.data);
+  if (id.success) await db.from('pf_contact_messages').delete().eq('id', id.data);
   go('/mensagens');
 }
 
@@ -188,7 +188,7 @@ export async function saveSettings(_: FormState, form: FormData): Promise<FormSt
     skills: d.skills.filter((s) => filled(s.title)),
     journey: d.journey.filter((j) => filled(j.title)),
   };
-  const { error } = await db.from('site_settings').update({ data }).eq('id', 1);
+  const { error } = await db.from('pf_site_settings').update({ data }).eq('id', 1);
   if (error) return { error: 'Não foi possível salvar.' };
   return { ok: 'Conteúdo salvo. Já está no ar.' };
 }

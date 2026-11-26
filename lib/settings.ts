@@ -27,7 +27,7 @@ export async function getSiteData(): Promise<SiteData> {
   if (!supabaseConfigured) return base as SiteData;
   try {
     const db = await createClient();
-    const { data } = await db.from('site_settings').select('data').eq('id', 1).maybeSingle();
+    const { data } = await db.from('pf_site_settings').select('data').eq('id', 1).maybeSingle();
     return merge(base as SiteData, data?.data);
   } catch {
     return base as SiteData;

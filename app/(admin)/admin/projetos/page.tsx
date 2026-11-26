@@ -5,7 +5,7 @@ import { AdminList } from '../_components/list';
 export default async function AdminProjects() {
   const { db } = await requireAdmin();
   const base = adminBase()!;
-  const { data } = await db.from('projects').select('id,title,slug,year,published').order('year', { ascending: false });
+  const { data } = await db.from('pf_projects').select('id,title,slug,year,published').order('year', { ascending: false });
   return (
     <AdminList
       title="Projetos"

@@ -36,23 +36,18 @@ mensagens do formulário de contato.
   **e** com sessão de dois fatores (`aal2`). A `service_role` não é usada.
 - **Sem rastro:** painel com `no-store`, `noindex` e `no-referrer`; cookies `SameSite=Strict`.
 
-### Configurar (uma vez)
+### Onde está o banco
 
-1. Crie um projeto no Supabase e rode, no SQL Editor, os arquivos de
-   `supabase/migrations/` em ordem (0001, 0002, 0003).
-2. Supabase → Authentication:
-   - **Sign In / Providers → Email:** desligue *Allow new users to sign up*.
-   - **Users → Add user:** crie seu usuário com senha forte (12+).
-   - **Multi-Factor:** deixe TOTP habilitado (padrão).
-   - **Passwords:** ative *leaked password protection* e mínimo de 12.
-3. No SQL Editor: `insert into public.admins (user_id) values ('<id do seu usuário>');`
-4. Variáveis na Vercel (Settings → Environment Variables):
-   - `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-   - `ADMIN_EMAILS` = seu e-mail
-   - `ADMIN_PATH` = um caminho aleatório longo (16–64 letras minúsculas, números
-     e hífens), ex.: gere com `openssl rand -hex 16`. **Não conte para ninguém.**
-5. Refaça o deploy, abra `https://seu-site/<ADMIN_PATH>`, entre e cadastre o
-   autenticador.
+O banco roda no projeto Supabase **Synapse** (o plano gratuito permite só dois
+projetos). Por isso todas as tabelas e funções do portfólio têm prefixo `pf_`
+(`supabase/migrations/0001_portfolio_pf.sql`) e nada do Synapse é tocado.
+As configurações de autenticação do projeto também não foram mudadas (o Synapse
+precisa delas): o painel exige estar em `pf_admins`, estar em `ADMIN_EMAILS` e
+ter o código do autenticador.
+
+Variáveis na Vercel: `NEXT_PUBLIC_SUPABASE_URL`,
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `ADMIN_EMAILS` e `ADMIN_PATH`.
+Para trocar o endereço secreto, mude `ADMIN_PATH` na Vercel e refaça o deploy.
 
 ## Segurança (três barreiras, nenhuma confia na anterior)
 

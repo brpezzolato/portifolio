@@ -8,8 +8,8 @@ export default async function EditPost({ params }: PageProps<'/admin/novidades/[
   const id = z.uuid().safeParse((await params).id);
   if (!id.success) notFound();
   const [{ data }, { data: projects }] = await Promise.all([
-    db.from('posts').select('*').eq('id', id.data).maybeSingle<PostRow>(),
-    db.from('projects').select('slug,title').order('title'),
+    db.from('pf_posts').select('*').eq('id', id.data).maybeSingle<PostRow>(),
+    db.from('pf_projects').select('slug,title').order('title'),
   ]);
   if (!data) notFound();
   return (

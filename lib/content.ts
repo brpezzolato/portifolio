@@ -50,7 +50,7 @@ export async function getProjects(): Promise<Project[]> {
     return [...seedProjects].sort((a, b) => b.year - a.year);
   const db = await createClient();
   const { data, error } = await db
-    .from('projects')
+    .from('pf_projects')
     .select(PROJECT_COLUMNS)
     .eq('published', true)
     .order('year', { ascending: false })
@@ -73,7 +73,7 @@ export async function getPosts(limit?: number): Promise<Post[]> {
   }
   const db = await createClient();
   let query = db
-    .from('posts')
+    .from('pf_posts')
     .select(POST_COLUMNS)
     .eq('published', true)
     .lte('published_at', new Date().toISOString())

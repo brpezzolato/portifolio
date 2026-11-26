@@ -19,7 +19,7 @@ async function attemptKey(scope: string) {
 
 async function allowAttempt(scope: string) {
   const db = await createClient();
-  const { data, error } = await db.rpc('register_login_attempt', { p_key: await attemptKey(scope) });
+  const { data, error } = await db.rpc('pf_register_login_attempt', { p_key: await attemptKey(scope) });
   return !error && data === true;
 }
 

@@ -33,6 +33,6 @@ export async function sendContact(_: ContactState, form: FormData): Promise<Cont
   const db = await createClient();
   const { website: _hp, ...row } = parsed.data;
   void _hp;
-  const { error } = await db.from('contact_messages').insert(row);
+  const { error } = await db.from('pf_contact_messages').insert(row);
   return { status: error ? 'fail' : 'ok' };
 }

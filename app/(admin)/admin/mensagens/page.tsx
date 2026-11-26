@@ -7,7 +7,7 @@ import { deleteMessage } from '../_actions/content';
 /* Mensagens do formulário de contato. Texto exibido como texto (nunca HTML). */
 export default async function AdminMessages() {
   const { db } = await requireAdmin();
-  const { data } = await db.from('contact_messages').select('id,name,email,message,created_at').order('created_at', { ascending: false }).limit(200);
+  const { data } = await db.from('pf_contact_messages').select('id,name,email,message,created_at').order('created_at', { ascending: false }).limit(200);
   const rows = data ?? [];
   return (
     <div>

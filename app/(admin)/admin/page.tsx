@@ -12,7 +12,7 @@ export default async function AdminHome() {
   const { db } = await requireAdmin();
   const base = adminBase()!;
   const count = async (table: string) => (await db.from(table).select('*', { count: 'exact', head: true })).count ?? 0;
-  const [projects, posts, messages] = await Promise.all([count('projects'), count('posts'), count('contact_messages')]);
+  const [projects, posts, messages] = await Promise.all([count('pf_projects'), count('pf_posts'), count('pf_contact_messages')]);
   const cards = [
     { n: projects, label: 'Projetos', href: '/projetos' },
     { n: posts, label: 'Novidades', href: '/novidades' },

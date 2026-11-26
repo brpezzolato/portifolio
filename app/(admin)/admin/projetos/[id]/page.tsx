@@ -7,7 +7,7 @@ export default async function EditProject({ params }: PageProps<'/admin/projetos
   const { db } = await requireAdmin();
   const id = z.uuid().safeParse((await params).id);
   if (!id.success) notFound();
-  const { data } = await db.from('projects').select('*').eq('id', id.data).maybeSingle<ProjectRow>();
+  const { data } = await db.from('pf_projects').select('*').eq('id', id.data).maybeSingle<ProjectRow>();
   if (!data) notFound();
   return (
     <div>
