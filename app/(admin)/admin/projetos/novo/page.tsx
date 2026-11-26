@@ -1,12 +1,13 @@
-import { requireAdmin } from '@/lib/admin';
+import { adminBase, requireAdmin } from '@/lib/admin';
 import { ProjectForm } from '../../_components/project-form';
+import { PageHeader } from '../../_components/ui';
 
 export default async function NewProject() {
   await requireAdmin();
   return (
-    <div>
-      <h1 className="mb-8 text-3xl font-semibold tracking-tight">Novo projeto</h1>
+    <>
+      <PageHeader back={{ href: `${adminBase()}/projetos`, label: 'Projetos' }} title="Novo projeto" description="Salve como rascunho e publique quando estiver pronto." />
       <ProjectForm />
-    </div>
+    </>
   );
 }

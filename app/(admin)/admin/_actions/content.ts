@@ -127,7 +127,6 @@ const settingsSchema = z.object({
   email: z.union([z.literal(''), z.email().max(254)]),
   github: httpsUrl,
   linkedin: httpsUrl,
-  cv: httpsUrl,
   status: t,
   tagline: t,
   hook: t,
@@ -173,10 +172,12 @@ export async function saveSettings(_: FormState, form: FormData): Promise<FormSt
     d.github && { label: 'GitHub', href: d.github },
     d.linkedin && { label: 'LinkedIn', href: d.linkedin },
   ].filter(Boolean);
+  // mantém o que não vem deste formulário (ex.: a data do currículo)
+  const { data: row } = await db.from('pf_site_settings').select('data').eq('id', 1).maybeSingle();
   const data = {
+    ...((row?.data ?? {}) as Record<string, unknown>),
     email: d.email,
     links,
-    cv: d.cv,
     status: d.status,
     tagline: d.tagline,
     hook: d.hook,

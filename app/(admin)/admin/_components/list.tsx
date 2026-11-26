@@ -1,55 +1,118 @@
-import Link from 'next/link';
-import { Plus, Trash2 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button, buttonVariants } from '@/components/ui/button';
-import { cn } from 'cn';
+'use client';
 
-/* Lista padrão do painel: título, metadados, rascunho/publicado, editar e
-   apagar (com confirmação nativa do formulário via botão em duas etapas). */
-export function AdminList({
-  title,
-  newHref,
-  rows,
-  remove,
-}: {
+import Link from 'next/link';
+import { useMemo, useState } from 'react';
+import { ChevronRight, FileText, FolderKanban, Plus, Search } from 'lucide-react';
+import { buttonVariants } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { cn } from 'cn';
+import { ConfirmDelete } from './confirm-delete';
+import { EmptyState, StatusPill } from './ui';
+
+export type ListRow = {
+  id: string;
   title: string;
+  meta: string;
+  tag?: string;
+  published: boolean;
+  href: string;
+};
+
+type Filter = 'todos' | 'publicados' | 'rascunhos';
+
+/* Lista do painel: filtro (todos / publicados / rascunhos), busca por título,
+   linhas clicáveis com status e apagar com confirmação. */
+export function AdminList({
+  rows,
+  newHref,
+  newLabel,
+  remove,
+  empty,
+  icon,
+}: {
+  rows: ListRow[];
   newHref: string;
-  rows: { id: string; title: string; meta: string; published?: boolean; href: string }[];
+  newLabel: string;
   remove: (form: FormData) => Promise<void>;
+  empty: { title: string; text: string };
+  icon: 'projetos' | 'novidades';
 }) {
+  const [filter, setFilter] = useState<Filter>('todos');
+  const [q, setQ] = useState('');
+
+  const counts = {
+    todos: rows.length,
+    publicados: rows.filter((r) => r.published).length,
+    rascunhos: rows.filter((r) => !r.published).length,
+  };
+  const shown = useMemo(() => {
+    const term = q.trim().toLowerCase();
+    return rows.filter(
+      (r) =>
+        (filter === 'todos' || (filter === 'publicados' ? r.published : !r.published)) &&
+        (!term || r.title.toLowerCase().includes(term) || r.meta.toLowerCase().includes(term)),
+    );
+  }, [rows, filter, q]);
+
+  if (rows.length === 0) {
+    return (
+      <EmptyState
+        icon={icon === 'projetos' ? FolderKanban : FileText}
+        title={empty.title}
+        text={empty.text}
+        action={
+          <Link href={newHref} className={cn(buttonVariants({ size: 'pill' }), 'h-10')}>
+            <Plus data-icon="inline-start" /> {newLabel}
+          </Link>
+        }
+      />
+    );
+  }
+
   return (
-    <div>
-      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
-        <Link href={newHref} className={cn(buttonVariants({ size: 'pill' }), 'h-10 px-5')}>
-          <Plus data-icon="inline-start" /> Novo
-        </Link>
+    <div className="rounded-3xl border border-border bg-card">
+      <div className="flex flex-col gap-3 border-b border-border p-3 sm:flex-row sm:items-center sm:justify-between">
+        <div role="tablist" className="flex gap-1 rounded-full bg-muted p-1">
+          {(['todos', 'publicados', 'rascunhos'] as Filter[]).map((f) => (
+            <button
+              key={f}
+              type="button"
+              role="tab"
+              aria-selected={filter === f}
+              onClick={() => setFilter(f)}
+              className={cn(
+                'rounded-full px-3.5 py-1.5 text-sm capitalize transition-colors',
+                filter === f ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              {f} <span className="ml-0.5 text-xs text-muted-foreground tabular-nums">{counts[f]}</span>
+            </button>
+          ))}
+        </div>
+        <div className="relative sm:w-64">
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar" className="h-10 rounded-full pl-9" aria-label="Buscar" />
+        </div>
       </div>
-      {rows.length === 0 ? (
-        <p className="rounded-3xl border border-dashed border-border p-10 text-center text-muted-foreground">Nada aqui ainda.</p>
+
+      {shown.length === 0 ? (
+        <p className="p-10 text-center text-sm text-muted-foreground">Nada encontrado com esse filtro.</p>
       ) : (
-        <ul className="divide-y divide-border rounded-3xl border border-border bg-card">
-          {rows.map((r) => (
-            <li key={r.id} className="flex items-center gap-4 p-4 sm:p-5">
-              <Link href={r.href} className="min-w-0 flex-1">
-                <span className="block truncate font-medium hover:text-signal">{r.title}</span>
-                <span className="block truncate text-sm text-muted-foreground">{r.meta}</span>
-              </Link>
-              {r.published !== undefined && <Badge variant={r.published ? 'signal' : 'mono'}>{r.published ? 'Publicado' : 'Rascunho'}</Badge>}
-              <details className="group relative">
-                <summary className="list-none">
-                  <span className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'cursor-pointer')} aria-label="Apagar">
-                    <Trash2 className="size-4" />
+        <ul className="divide-y divide-border">
+          {shown.map((r) => (
+            <li key={r.id} className="group flex items-center gap-3 px-3 py-2 sm:px-4">
+              <Link href={r.href} className="flex min-w-0 flex-1 items-center gap-4 rounded-2xl px-2 py-3 transition-colors">
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-center gap-2">
+                    <span className="truncate font-medium transition-colors group-hover:text-signal">{r.title}</span>
+                    {r.tag && <span className="hidden shrink-0 rounded-md bg-muted px-1.5 py-0.5 text-[0.7rem] text-muted-foreground sm:inline">{r.tag}</span>}
                   </span>
-                </summary>
-                <form action={remove} className="absolute right-0 z-10 mt-2 w-56 rounded-2xl border border-border bg-popover p-3 shadow-lg">
-                  <input type="hidden" name="id" value={r.id} />
-                  <p className="text-sm">Apagar de vez? Não dá para desfazer.</p>
-                  <Button type="submit" variant="destructive" size="sm" className="mt-3 w-full">
-                    Apagar
-                  </Button>
-                </form>
-              </details>
+                  <span className="mt-0.5 block truncate font-mono text-xs text-muted-foreground">{r.meta}</span>
+                </span>
+                <StatusPill published={r.published} />
+                <ChevronRight className="hidden size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 sm:block" />
+              </Link>
+              <ConfirmDelete id={r.id} what={r.title} action={remove} />
             </li>
           ))}
         </ul>

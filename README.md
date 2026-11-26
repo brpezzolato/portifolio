@@ -24,8 +24,12 @@ Sem `.env.local` o site funciona com o conteúdo de exemplo de `lib/seed.ts`.
 ## Painel administrativo (rota escondida)
 
 Tudo o que aparece no site é editado pelo painel: conteúdo (textos PT/EN, links,
-cartões, jornada, etiquetas), projetos, novidades (com rascunho e data) e as
-mensagens do formulário de contato.
+cartões, jornada, etiquetas), currículo em PDF, projetos, novidades (com rascunho
+e data) e as mensagens do formulário de contato.
+
+- **Currículo:** enviado no painel (só PDF, até 4 MB) para o espaço de arquivos
+  `cv` do Supabase. O site mostra a seção de currículo e entrega o arquivo em
+  `/curriculo`, com nome de download. Sem PDF enviado, a seção some.
 
 - **Endereço secreto:** o painel abre só em `/<ADMIN_PATH>`. `/admin` e qualquer
   outro caminho respondem 404. Sem `ADMIN_PATH`, o painel fica desligado.

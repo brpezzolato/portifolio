@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { useTheme } from 'next-themes';
-import { Menu, Moon, Sun } from 'lucide-react';
+import { FileDown, Menu, Moon, Sun } from 'lucide-react';
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { nav, ui } from '@/lib/site';
 import { useSite } from '@/components/site/site-data';
@@ -91,6 +91,17 @@ export function SiteHeader() {
 
         <span className="mx-1 hidden h-5 w-px bg-foreground/10 md:block" />
         <div className="hidden sm:block">{Lang}</div>
+        {site.cv && (
+          <a
+            href="/curriculo"
+            download
+            aria-label={t(ui.downloadCv)}
+            title={t(ui.downloadCv)}
+            className="grid size-9 place-items-center rounded-full transition-colors hover:bg-foreground/[0.07]"
+          >
+            <FileDown className="size-4" />
+          </a>
+        )}
         <button
           type="button"
           aria-label={t(ui.theme)}

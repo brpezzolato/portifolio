@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState } from 'react';
-import { ArrowRight, ArrowUpRight, AtSign, Code2, Mail, UserRound } from 'lucide-react';
+import { ArrowDown, ArrowRight, ArrowUpRight, AtSign, Code2, FileText, Mail, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -46,6 +46,9 @@ export function Contact() {
       href: l.href,
       external: true,
     })),
+    ...(site.cv
+      ? [{ icon: FileText, label: ui.cvLabel, value: t(ui.downloadCv), href: '/curriculo', external: false, download: true }]
+      : []),
   ];
 
   return (
@@ -71,6 +74,7 @@ export function Contact() {
                     <a
                       href={c.href}
                       {...(c.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                      {...('download' in c ? { download: true } : {})}
                       className="group flex items-center gap-4 border-b border-border py-5"
                     >
                       <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-signal/10 text-signal">
@@ -80,7 +84,11 @@ export function Contact() {
                         <span className="block text-sm text-muted-foreground">{t(c.label)}</span>
                         <span className="block truncate font-medium transition-colors group-hover:text-signal">{c.value}</span>
                       </span>
-                      <ArrowUpRight className="size-5 shrink-0 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground" />
+                      {'download' in c ? (
+                        <ArrowDown className="size-5 shrink-0 text-muted-foreground transition-all group-hover:translate-y-0.5 group-hover:text-foreground" />
+                      ) : (
+                        <ArrowUpRight className="size-5 shrink-0 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground" />
+                      )}
                     </a>
                   </li>
                 );

@@ -4,6 +4,8 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  // envio do currículo (PDF até 4 MB) pelo painel
+  experimental: { serverActions: { bodySizeLimit: '4.5mb' } },
   turbopack: {
     rules: {
       '*.css': {

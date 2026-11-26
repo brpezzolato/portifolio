@@ -6,6 +6,7 @@ import { Journey } from '@/components/site/home/journey';
 import { KineticSkills } from '@/components/site/home/kinetic-skills';
 import { News } from '@/components/site/home/news';
 import { Projects } from '@/components/site/home/projects';
+import { Resume } from '@/components/site/home/resume';
 import { getPosts, getProjects } from '@/lib/content';
 
 export default async function Home() {
@@ -18,6 +19,7 @@ export default async function Home() {
       <KineticSkills />
       <Projects projects={ordered} />
       <Journey />
+      <Resume />
       <Gallery />
       <News posts={posts.slice(0, 4)} />
       <Contact />

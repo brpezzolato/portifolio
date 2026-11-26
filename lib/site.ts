@@ -12,7 +12,9 @@ export const site = {
     { label: 'GitHub', href: 'https://github.com/brpezzolato' },
     { label: 'LinkedIn', href: 'https://linkedin.com/in/seu-usuario' }, // TODO
   ],
-  cv: null as string | null, // TODO: ponha o PDF em /public e escreva '/cv.pdf'
+  /* Data (ISO) do último envio do currículo pelo painel; null = sem currículo.
+     O arquivo é baixado em /curriculo. */
+  cv: null as string | null,
   url: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
 
   status: { pt: 'Construindo o Vetra', en: 'Building Vetra' } as T,
@@ -80,7 +82,15 @@ export const ui = {
   },
   seeProjects: { pt: 'Ver projetos', en: 'See projects' },
   contact: { pt: 'Contato', en: 'Contact' },
-  downloadCv: { pt: 'Baixar CV', en: 'Download CV' },
+  downloadCv: { pt: 'Baixar currículo', en: 'Download résumé' },
+  cvLabel: { pt: 'Currículo', en: 'Résumé' },
+  cvTitle: { pt: 'Meu currículo, em uma página.', en: 'My résumé, on one page.' },
+  cvText: {
+    pt: 'Formação, experiência e ferramentas que uso no dia a dia. PDF pronto para imprimir ou anexar.',
+    en: 'Education, experience and the tools I use every day. A PDF ready to print or attach.',
+  },
+  cvUpdated: { pt: 'Atualizado em', en: 'Updated on' },
+  cvFile: { pt: 'PDF', en: 'PDF' },
   statProjects: { pt: 'Projetos publicados', en: 'Published projects' },
   statStack: { pt: 'Tecnologias no dia a dia', en: 'Technologies I use' },
   statNews: { pt: 'Novidades postadas', en: 'Updates posted' },
