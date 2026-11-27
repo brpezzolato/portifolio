@@ -17,7 +17,7 @@ export function Resume() {
   const reduce = useReducedMotion();
   if (!site.cv) return null;
 
-  const updated = new Date(site.cv).toLocaleDateString(lang === 'pt' ? 'pt-BR' : 'en-US', {
+  const updated = new Date(site.cv).toLocaleDateString({ pt: 'pt-BR', en: 'en-US', es: 'es-ES' }[lang], {
     day: 'numeric',
     month: 'long',
     year: 'numeric',

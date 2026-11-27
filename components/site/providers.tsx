@@ -2,24 +2,29 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { ThemeProvider } from 'next-themes';
-import type { Lang } from '@/lib/site';
+import { langs, type Lang } from '@/lib/site';
 
-type Ctx = { lang: Lang; setLang: (l: Lang) => void; t: (v: Record<Lang, string>) => string };
-const LangCtx = createContext<Ctx>({ lang: 'pt', setLang: () => {}, t: (v) => v.pt });
+type Text = Partial<Record<Lang, string>>;
+type Ctx = { lang: Lang; setLang: (l: Lang) => void; t: (v: Text) => string };
+
+/* Texto no idioma escolhido; se faltar (ex.: algo ainda sem espanhol), cai
+   para o inglês e depois para o português. */
+const pick = (v: Text, l: Lang) => v[l] || v.en || v.pt || '';
+const LangCtx = createContext<Ctx>({ lang: 'pt', setLang: () => {}, t: (v) => pick(v, 'pt') });
 
 export const useLang = () => useContext(LangCtx);
 
-/* Tema (claro/escuro, via next-themes) e idioma (PT/EN, guardado no navegador). */
+/* Tema (claro/escuro, via next-themes) e idioma (PT/EN/ES, guardado no navegador). */
 export function Providers({ children, nonce }: { children: React.ReactNode; nonce?: string }) {
   const [lang, setLangState] = useState<Lang>('pt');
   useEffect(() => {
     try {
       const saved = localStorage.getItem('lang');
-      if (saved === 'en' || saved === 'pt') setLangState(saved);
+      if ((langs as readonly string[]).includes(saved ?? '')) setLangState(saved as Lang);
     } catch {}
   }, []);
   useEffect(() => {
-    document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en';
+    document.documentElement.lang = { pt: 'pt-BR', en: 'en', es: 'es' }[lang];
   }, [lang]);
   const setLang = (l: Lang) => {
     setLangState(l);
@@ -29,13 +34,13 @@ export function Providers({ children, nonce }: { children: React.ReactNode; nonc
   };
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} nonce={nonce} disableTransitionOnChange>
-      <LangCtx.Provider value={{ lang, setLang, t: (v) => v[lang] }}>{children}</LangCtx.Provider>
+      <LangCtx.Provider value={{ lang, setLang, t: (v) => pick(v, lang) }}>{children}</LangCtx.Provider>
     </ThemeProvider>
   );
 }
 
 /* Texto traduzido dentro de Server Components. */
-export function Tr({ v }: { v: Record<Lang, string> }) {
+export function Tr({ v }: { v: Text }) {
   const { t } = useLang();
   return <>{t(v)}</>;
 }

@@ -10,8 +10,16 @@ export type SiteData = Omit<typeof defaults, 'url'>;
 
 type Json = Record<string, unknown>;
 const isObj = (v: unknown): v is Json => typeof v === 'object' && v !== null && !Array.isArray(v);
+const isText = (v: unknown): v is Json => isObj(v) && typeof v.pt === 'string' && typeof v.en === 'string';
+
 function merge<T>(base: T, over: unknown): T {
   if (over === undefined || over === null) return base;
+  // Texto em idiomas: vale o que foi salvo no painel. Um idioma que ainda não
+  // foi salvo fica vazio (o site cai para o inglês), em vez de herdar o texto
+  // padrão, que poderia não corresponder ao português editado.
+  if (isText(base) && isObj(over)) {
+    return { pt: String(over.pt ?? ''), en: String(over.en ?? ''), es: String(over.es ?? '') } as T;
+  }
   if (Array.isArray(base)) return (Array.isArray(over) ? over : base) as T;
   if (isObj(base) && isObj(over)) {
     const out: Json = { ...base };

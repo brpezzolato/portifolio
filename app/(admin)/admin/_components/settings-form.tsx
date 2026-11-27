@@ -1,55 +1,84 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import { ArrowDown, ArrowUp, Briefcase, Link2, Plus, Sparkles, Trash2, UserRound } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowDown, ArrowUp, Briefcase, Languages, Link2, Loader2, Plus, Sparkles, Trash2, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import type { SiteData } from '@/lib/settings';
-import { saveSettings } from '../_actions/content';
+import { saveSettings, translateText } from '../_actions/content';
 import { Field } from './fields';
 import { SaveBar } from './save-bar';
 import { useSave } from './use-save';
 import { Panel } from './ui';
 
-type T = { pt: string; en: string };
+type T = { pt: string; en: string; es?: string };
 
-/* Campo bilíngue: PT e EN lado a lado, com etiqueta do idioma dentro do campo. */
-function Bi({ label, name, value, long, hint }: { label: string; name: string; value: T; long?: boolean; hint?: string }) {
+/* Escreve num campo do formulário pelo nome e avisa o formulário (para marcar
+   "alterações não salvas"). */
+function setField(scope: HTMLElement | null, name: string, value: string) {
+  const el = scope?.closest('form')?.querySelector<HTMLInputElement | HTMLTextAreaElement>(`[name="${CSS.escape(name)}"]`);
+  if (!el) return;
+  el.value = value;
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function LangField({ label, name, value, lang, long }: { label: string; name: string; value: string; lang: string; long?: boolean }) {
   return (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      <div className="grid gap-3 sm:grid-cols-2">
-        {(['pt', 'en'] as const).map((l) => (
-          <div key={l} className="relative">
-            <span className="pointer-events-none absolute top-2.5 right-3 z-10 rounded-md bg-muted px-1.5 py-0.5 font-mono text-[0.65rem] text-muted-foreground uppercase">
-              {l}
-            </span>
-            {long ? (
-              <Textarea
-                aria-label={`${label} (${l.toUpperCase()})`}
-                name={`${name}.${l}`}
-                defaultValue={value[l]}
-                rows={5}
-                maxLength={1200}
-                className="rounded-xl bg-background pr-12"
-              />
-            ) : (
-              <Input
-                aria-label={`${label} (${l.toUpperCase()})`}
-                name={`${name}.${l}`}
-                defaultValue={value[l]}
-                maxLength={1200}
-                autoComplete="off"
-                className="h-11 rounded-xl bg-background pr-12"
-              />
-            )}
-          </div>
-        ))}
+    <div className="relative">
+      <span className="pointer-events-none absolute top-2.5 right-3 z-10 rounded-md bg-muted px-1.5 py-0.5 font-mono text-[0.65rem] text-muted-foreground uppercase">
+        {lang}
+      </span>
+      {long ? (
+        <Textarea aria-label={`${label} (${lang.toUpperCase()})`} name={name} defaultValue={value} rows={lang === 'pt' ? 5 : 4} maxLength={1200} className="rounded-xl bg-background pr-12" />
+      ) : (
+        <Input aria-label={`${label} (${lang.toUpperCase()})`} name={name} defaultValue={value} maxLength={1200} autoComplete="off" className="h-11 rounded-xl bg-background pr-12" />
+      )}
+    </div>
+  );
+}
+
+/* Campo em três idiomas: português em cima (é onde você escreve) e, embaixo,
+   inglês e espanhol, preenchidos pela tradução automática ao salvar ou pelo
+   botão "Traduzir". Dá para ajustar EN/ES à mão: o que você mexer não é
+   sobrescrito. */
+function Bi({ label, name, value, long, hint }: { label: string; name: string; value: T; long?: boolean; hint?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const run = async () => {
+    const pt = ref.current?.closest('form')?.querySelector<HTMLInputElement>(`[name="${CSS.escape(`${name}.pt`)}"]`)?.value ?? '';
+    setBusy(true);
+    setErr(null);
+    const r = await translateText(pt);
+    setBusy(false);
+    if (r.error) return setErr(r.error);
+    setField(ref.current, `${name}.en`, r.en ?? '');
+    setField(ref.current, `${name}.es`, r.es ?? '');
+  };
+  return (
+    <div ref={ref} className="space-y-2">
+      <div className="flex items-center justify-between gap-3">
+        <Label>{label}</Label>
+        <button
+          type="button"
+          onClick={run}
+          disabled={busy}
+          className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-60"
+        >
+          {busy ? <Loader2 className="size-3.5 animate-spin" /> : <Languages className="size-3.5" />}
+          {busy ? 'Traduzindo…' : 'Traduzir'}
+        </button>
       </div>
-      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
+      <LangField label={label} name={`${name}.pt`} value={value.pt} lang="pt" long={long} />
+      <div className="grid gap-3 sm:grid-cols-2">
+        <LangField label={label} name={`${name}.en`} value={value.en} lang="en" long={long} />
+        <LangField label={label} name={`${name}.es`} value={value.es ?? ''} lang="es" long={long} />
+      </div>
+      {err ? <p className="text-xs text-destructive">{err}</p> : hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
   );
 }
@@ -64,7 +93,7 @@ function Item({ n, children }: { n: number; children: React.ReactNode }) {
   );
 }
 
-const empty: T = { pt: '', en: '' };
+const empty: T = { pt: '', en: '', es: '' };
 const pad = <X,>(arr: readonly X[], n: number, fill: X) => [...arr, ...Array(Math.max(0, n - arr.length)).fill(fill)].slice(0, n) as X[];
 
 const tabs = [
@@ -77,10 +106,37 @@ const tabs = [
 export function SettingsForm({ s }: { s: SiteData }) {
   const save = useSave(saveSettings);
   const link = (label: string) => s.links.find((l) => l.label === label)?.href ?? '';
-  const orgT = (o: string | T): T => (typeof o === 'string' ? { pt: o, en: o } : o);
+  const orgT = (o: string | T): T => (typeof o === 'string' ? { pt: o, en: o, es: o } : o);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // traduções feitas no servidor ao salvar aparecem nos campos na hora
+  useEffect(() => {
+    const filled = save.state?.filled;
+    if (!filled) return;
+    for (const [name, value] of Object.entries(filled)) {
+      const el = formRef.current?.querySelector<HTMLInputElement | HTMLTextAreaElement>(`[name="${CSS.escape(name)}"]`);
+      if (el) el.value = value;
+    }
+  }, [save.state]);
 
   return (
-    <form {...save.form}>
+    <form ref={formRef} {...save.form}>
+      <label
+        htmlFor="auto_translate"
+        className="mb-6 flex cursor-pointer items-center gap-4 rounded-3xl border border-border bg-card p-5 transition-colors hover:border-foreground/20"
+      >
+        <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-signal/10 text-signal">
+          <Languages className="size-5" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm font-medium">Tradução automática</span>
+          <span className="mt-0.5 block text-xs text-pretty text-muted-foreground">
+            Escreva só em português: ao salvar, o inglês e o espanhol vazios (ou desatualizados) são preenchidos sozinhos. O que você ajustar à mão em EN/ES é mantido.
+          </span>
+        </span>
+        <Switch id="auto_translate" name="auto_translate" defaultChecked />
+      </label>
+
       <Tabs defaultValue="contato" className="gap-6">
         <TabsList variant="line" className="h-auto! w-full justify-start gap-1 overflow-x-auto border-b border-border pb-0">
           {tabs.map((t) => (

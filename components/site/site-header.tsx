@@ -6,7 +6,7 @@ import { motion } from 'motion/react';
 import { useTheme } from 'next-themes';
 import { FileDown, Menu, Moon, Sun } from 'lucide-react';
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { nav, ui } from '@/lib/site';
+import { langs, nav, ui } from '@/lib/site';
 import { useSite } from '@/components/site/site-data';
 import { cn } from 'cn';
 import { useLang } from './providers';
@@ -33,7 +33,7 @@ export function SiteHeader() {
 
   const Lang = (
     <div className="flex items-center rounded-full bg-foreground/5 p-0.5 text-xs">
-      {(['pt', 'en'] as const).map((l) => (
+      {langs.map((l) => (
         <button
           key={l}
           type="button"

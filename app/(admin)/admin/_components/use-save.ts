@@ -10,9 +10,9 @@ type State = { ok?: string; error?: string } | null;
    - mantém na tela o que foi digitado, inclusive quando dá erro;
    - marca "alterações não salvas" ao mexer em qualquer campo;
    - depois de salvar, atualiza os dados da página e guarda a hora. */
-export function useSave(fn: (prev: State, form: FormData) => Promise<State>) {
+export function useSave<S extends State>(fn: (prev: Awaited<S>, form: FormData) => Promise<S>) {
   const router = useRouter();
-  const [state, action, pending] = useActionState<State, FormData>(fn, null);
+  const [state, action, pending] = useActionState<S, FormData>(fn, null as Awaited<S>);
   const [dirty, setDirty] = useState(false);
   const [savedAt, setSavedAt] = useState<Date | null>(null);
 

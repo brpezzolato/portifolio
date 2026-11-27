@@ -43,6 +43,7 @@ export function SaveBar({
     msg = (
       <span className="inline-flex items-center gap-2 text-foreground">
         <CheckCircle2 className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" /> Salvo às {time} · já está no ar
+        {state?.ok?.split(' · ').slice(1).map((x) => ` · ${x}`).join('')}
       </span>
     );
   } else {

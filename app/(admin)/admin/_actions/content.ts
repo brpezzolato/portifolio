@@ -3,11 +3,14 @@
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { adminBase, requireAdmin } from '@/lib/admin';
+import { translate, type Target } from '@/lib/translate';
 
 /* Todas as ações reverificam o admin (aal2) e usam o cliente da sessão:
    o banco aplica o RLS de novo. Nada usa a service_role. */
 
-export type FormState = { ok?: string; error?: string } | null;
+/* filled: campos traduzidos automaticamente (nome do campo → texto), para o
+   painel mostrar na tela sem recarregar. */
+export type FormState = { ok?: string; error?: string; filled?: Record<string, string> } | null;
 
 const slug = z.string().trim().min(1).max(80).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Slug: só letras minúsculas, números e hífens.');
 const httpsUrl = z
@@ -122,7 +125,7 @@ export async function deleteMessage(form: FormData) {
 }
 
 /* ---------- conteúdo do site ---------- */
-const t = z.object({ pt: z.string().trim().max(1200), en: z.string().trim().max(1200) });
+const t = z.object({ pt: z.string().trim().max(1200), en: z.string().trim().max(1200), es: z.string().trim().max(1200).default('') });
 const settingsSchema = z.object({
   email: z.union([z.literal(''), z.email('E-mail inválido. Confira o endereço.').max(254)]),
   github: httpsUrl,
@@ -137,6 +140,7 @@ const settingsSchema = z.object({
   chips: z.array(t).max(6),
   skills: z.array(z.object({ title: t, detail: t })).max(8),
   journey: z.array(z.object({ title: t, org: t, kind: t, text: t })).max(60),
+  auto_translate: z.string().optional(),
 });
 
 /* Monta objeto aninhado a partir de nomes como "skills.0.title.pt". */
@@ -161,7 +165,64 @@ function nested(form: FormData) {
   return root;
 }
 
-const filled = (o: { pt: string; en: string }) => o.pt !== '' || o.en !== '';
+const filled = (o: { pt: string; en: string; es?: string }) => o.pt !== '' || o.en !== '' || !!o.es;
+
+type Text = { pt: string; en: string; es: string };
+const get = (obj: unknown, path: (string | number)[]): unknown =>
+  path.reduce<unknown>((n, k) => (n && typeof n === 'object' ? (n as Record<string | number, unknown>)[k] : undefined), obj);
+
+/* Traduz automaticamente do português para inglês e espanhol, campo a campo.
+   Traduz quando o idioma está vazio, ou quando o português mudou desde o
+   último salvamento e aquele idioma não foi mexido à mão. O que você
+   escreveu manualmente em EN/ES nunca é sobrescrito. */
+async function autoTranslate(d: Record<string, unknown>, prev: unknown) {
+  const jobs: { name: string; text: Text; target: Target; pt: string }[] = [];
+  const visit = (node: unknown, path: (string | number)[]) => {
+    if (Array.isArray(node)) return node.forEach((v, i) => visit(v, [...path, i]));
+    if (!node || typeof node !== 'object') return;
+    const o = node as Record<string, unknown>;
+    if (typeof o.pt === 'string' && typeof o.en === 'string') {
+      const text = o as unknown as Text;
+      if (!text.pt) return;
+      const before = get(prev, path) as Partial<Text> | undefined;
+      for (const target of ['en', 'es'] as const) {
+        const changedPt = before?.pt !== undefined && before.pt !== text.pt;
+        const untouched = (before?.[target] ?? '') === text[target];
+        if (!text[target] || (changedPt && untouched)) jobs.push({ name: [...path, target].join('.'), text, target, pt: text.pt });
+      }
+      return;
+    }
+    for (const [k, v] of Object.entries(o)) visit(v, [...path, k]);
+  };
+  visit(d, []);
+
+  const filledOut: Record<string, string> = {};
+  let failed = 0;
+  // poucos pedidos por vez, para não estourar o serviço gratuito
+  for (let i = 0; i < jobs.length; i += 4) {
+    await Promise.all(
+      jobs.slice(i, i + 4).map(async (j) => {
+        const out = await translate(j.pt, j.target);
+        if (out === null) failed++;
+        else {
+          j.text[j.target] = out;
+          filledOut[j.name] = out;
+        }
+      }),
+    );
+  }
+  return { filled: filledOut, failed };
+}
+
+/* Botão "Traduzir" de um campo: devolve inglês e espanhol do texto em português. */
+export async function translateText(pt: string): Promise<{ en?: string; es?: string; error?: string }> {
+  await requireAdmin();
+  const src = String(pt ?? '').slice(0, 1200);
+  if (!src.trim()) return { error: 'Escreva o texto em português primeiro.' };
+  const [en, es] = await Promise.all([translate(src, 'en'), translate(src, 'es')]);
+  if (en === null || es === null) return { error: 'O tradutor gratuito não respondeu agora. Tente de novo em instantes.' };
+  return { en, es };
+}
 
 export async function saveSettings(_: FormState, form: FormData): Promise<FormState> {
   const { db } = await requireAdmin();
@@ -174,6 +235,13 @@ export async function saveSettings(_: FormState, form: FormData): Promise<FormSt
   ].filter(Boolean);
   // mantém o que não vem deste formulário (ex.: a data do currículo)
   const { data: row } = await db.from('pf_site_settings').select('data').eq('id', 1).maybeSingle();
+  const tr =
+    d.auto_translate === 'on' || d.auto_translate === 'true'
+      ? await autoTranslate(
+          { status: d.status, tagline: d.tagline, hook: d.hook, short: d.short, intro: d.intro, bio: d.bio, chips: d.chips, skills: d.skills, journey: d.journey },
+          row?.data,
+        )
+      : { filled: {}, failed: 0 };
   const data = {
     ...((row?.data ?? {}) as Record<string, unknown>),
     email: d.email,
@@ -191,5 +259,10 @@ export async function saveSettings(_: FormState, form: FormData): Promise<FormSt
   };
   const { error } = await db.from('pf_site_settings').update({ data }).eq('id', 1);
   if (error) return { error: 'Não foi possível salvar.' };
-  return { ok: 'Conteúdo salvo. Já está no ar.' };
+  const n = Object.keys(tr.filled).length;
+  const extra = [
+    n ? `${n} ${n === 1 ? 'tradução feita' : 'traduções feitas'} automaticamente` : '',
+    tr.failed ? `${tr.failed} não ${tr.failed === 1 ? 'pôde ser traduzida' : 'puderam ser traduzidas'} agora (tente salvar de novo)` : '',
+  ].filter(Boolean);
+  return { ok: ['Conteúdo salvo. Já está no ar.', ...extra].join(' · '), filled: tr.filled };
 }
